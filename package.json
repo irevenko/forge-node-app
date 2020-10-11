@@ -1,0 +1,27 @@
+{
+  "name": "forge-ts-node-app",
+  "version": "1.0.0",
+  "description": "A Fast Way To Generate Node.js/TypeScript App",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/irevenko/forge-ts-node-app.git"
+  },
+  "keywords": [
+    "typescript",
+    "nodejs"
+  ],
+  "author": "Ilya Revenko <ilya.revenko17@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/irevenko/forge-ts-node-app/issues"
+  },
+  "homepage": "https://github.com/irevenko/forge-ts-node-app#readme",
+  "devDependencies": {},
+  "dependencies": {
+    "inquirer": "^7.3.3"
+  }
+}
