@@ -9,9 +9,7 @@ inquirer
       choices: ['eslint + prettier', 'eslint', 'prettier'],
     },
   ])
-  .then((answers) => {
-    console.log(answers);
-  })
+  .then((answers) => answers)
   .catch((error) => {
     console.error(error);
   });
