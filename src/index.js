@@ -1,14 +1,8 @@
 const inquirer = require('inquirer');
+const { questions } = require('./questions');
 
 inquirer
-  .prompt([
-    {
-      type: 'list',
-      message: 'Pick the config:',
-      name: 'config',
-      choices: ['eslint + prettier', 'eslint', 'prettier'],
-    },
-  ])
+  .prompt(questions)
   .then((answers) => answers)
   .catch((error) => {
     console.error(error);
