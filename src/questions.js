@@ -6,16 +6,16 @@ const questions = [
     choices: ['npm', 'yarn'],
   },
   {
+    type: 'list',
+    message: 'Will you use TypeScript?',
+    name: 'typescript',
+    choices: ['Yes', 'No'],
+  },
+  {
     type: 'checkbox',
     message: 'Pick the config:',
     name: 'config',
     choices: ['ESLint', 'Prettier', 'Unit Tests', 'E2E Tests'],
-  },
-  {
-    type: 'list',
-    message: 'Does you project use TypeScript?',
-    name: 'typescript',
-    choices: ['Yes', 'No'],
   },
 ];
 
