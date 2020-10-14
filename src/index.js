@@ -1,13 +1,19 @@
+/* eslint-disable prefer-const */
 const inquirer = require('inquirer');
-const { questions } = require('./questions');
+const { questions } = require('./helpers/questions');
+const { handleProjectSettings } = require('./helpers/project_generator');
 
-// let finalSetup = [];
+async function buildProject() {
+  const answers = await inquirer
+    .prompt(questions)
+    .catch((error) => console.error(error));
 
-inquirer
-  .prompt(questions)
-  .then((answers) => {
-    return answers;
-  })
-  .catch((error) => {
-    console.error(error);
-  });
+  handleProjectSettings(
+    answers.projectName,
+    answers.pkgManager,
+    answers.typescript,
+    answers.extraSettings
+  );
+}
+
+buildProject();
