@@ -8,7 +8,6 @@ async function buildProject() {
     .catch((error) => console.error(error));
 
   handleProjectSettings(
-    answers.folderChoice,
     answers.projectName,
     answers.pkgManager,
     answers.typescript,

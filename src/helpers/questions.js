@@ -1,15 +1,9 @@
 const questions = [
   {
-    type: 'list',
-    message: '🗂  Create new folder or continue in this',
-    name: 'folderChoice',
-    choices: ['Create new', 'Continue here'],
-  },
-  {
     type: 'text',
     message: '📝 Enter project name:',
     name: 'projectName',
-    when: (a) => a.folderChoice === 'Create new',
+    default: 'node-project',
   },
   {
     type: 'list',

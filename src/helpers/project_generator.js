@@ -1,37 +1,41 @@
 const fs = require('fs');
 const { execSync } = require('child_process');
 
-function initPackageInCurDir(pkgManager) {
-  fs.mkdirSync('src');
-  fs.writeFileSync(`./src/index.js`, 'console.log("hi");');
-  execSync(`${pkgManager} init -y`);
-  console.log(`🎊🎉 Ready!\n🚀 Go ${pkgManager} start`);
-}
-
-function initPackageInNewDir(projectName, pkgManager) {
-  fs.mkdirSync(`${projectName}/src`, { recursive: true });
-  fs.writeFileSync(`./${projectName}/src/index.js`, 'console.log("hi");');
+function initPackage(projectName, pkgManager) {
+  fs.mkdirSync(projectName);
   execSync(`cd ${projectName} && ${pkgManager} init -y`);
-  console.log(`🎊🎉 Ready!\n🚀 Go cd ${projectName} && ${pkgManager} start`);
 }
 
-function handleProjectSettings(
-  folderChoice,
-  projectName,
-  pkgManager,
-  ts,
-  settings
-) {
-  console.log(`Your using: ${pkgManager}`);
-  console.log(`TS: ${ts}`);
-  console.log(`Additional tools: ${settings}`);
+function createSourceFolder(projectName, typescript) {
+  fs.mkdirSync(`${projectName}/src`, { recursive: true });
+  if (typescript) {
+    fs.writeFileSync(
+      `./${projectName}/src/index.ts`,
+      'const n: number = 5;\nconsole.log(n);'
+    );
+  } else {
+    fs.writeFileSync(
+      `./${projectName}/src/index.js`,
+      'const n = 5;\nconsole.log(n);'
+    );
+  }
+}
+
+function initTypescript(projectName) {
+  execSync(`cd ${projectName} && tsc --init`);
+}
+
+// eslint-disable-next-line no-unused-vars
+function handleProjectSettings(projectName, pkgManager, typescript, settings) {
   console.log('🔨 Setting up the project...');
 
-  if (folderChoice === 'Create new') {
-    initPackageInNewDir(projectName, pkgManager);
-  } else {
-    initPackageInCurDir(pkgManager);
+  initPackage(projectName, pkgManager);
+  if (typescript) {
+    initTypescript(projectName, typescript);
   }
+  createSourceFolder(projectName, typescript);
+
+  console.log(`🎊🎉 Ready!\n🚀 Go cd ${projectName} && ${pkgManager} start`);
 }
 
 module.exports = {
