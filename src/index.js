@@ -10,7 +10,7 @@ async function buildProject() {
   handleProjectSettings(
     answers.projectName,
     answers.pkgManager,
-    answers.typescript,
+    answers.typeScript,
     answers.extraSettings
   );
 }

@@ -1,14 +1,15 @@
 const fs = require('fs');
 const { execSync } = require('child_process');
+const { installTsDependencies } = require('./package_manager');
 
 function initPackage(projectName, pkgManager) {
   fs.mkdirSync(projectName);
   execSync(`cd ${projectName} && ${pkgManager} init -y`);
 }
 
-function createSourceFolder(projectName, typescript) {
+function createSrcFolder(projectName, typeScript) {
   fs.mkdirSync(`${projectName}/src`, { recursive: true });
-  if (typescript) {
+  if (typeScript) {
     fs.writeFileSync(
       `./${projectName}/src/index.ts`,
       'const n: number = 5;\nconsole.log(n);'
@@ -21,21 +22,22 @@ function createSourceFolder(projectName, typescript) {
   }
 }
 
-function initTypescript(projectName) {
+function initTypeScript(projectName) {
   execSync(`cd ${projectName} && tsc --init`);
 }
 
 // eslint-disable-next-line no-unused-vars
-function handleProjectSettings(projectName, pkgManager, typescript, settings) {
+function handleProjectSettings(projectName, pkgManager, typeScript, settings) {
   console.log('🔨 Setting up the project...');
 
   initPackage(projectName, pkgManager);
-  if (typescript) {
-    initTypescript(projectName, typescript);
+  if (typeScript) {
+    initTypeScript(projectName, typeScript);
+    installTsDependencies(pkgManager, projectName);
   }
-  createSourceFolder(projectName, typescript);
+  createSrcFolder(projectName, typeScript);
 
-  console.log(`🎊🎉 Ready!\n🚀 Go cd ${projectName} && ${pkgManager} start`);
+  console.log(`🎊🎉 Ready!\n🚀 cd ${projectName} && ${pkgManager} start`);
 }
 
 module.exports = {

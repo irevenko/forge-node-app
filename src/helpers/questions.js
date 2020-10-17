@@ -14,7 +14,7 @@ const questions = [
   {
     type: 'confirm',
     message: '🤓 Will you use TypeScript?',
-    name: 'typescript',
+    name: 'typeScript',
     default: false,
   },
   {
