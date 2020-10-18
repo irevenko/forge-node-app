@@ -1,9 +1,21 @@
+/* eslint-disable prettier/prettier */
 const questions = [
   {
-    type: 'text',
+    type: 'input',
     message: '📝 Enter project name:',
     name: 'projectName',
-    default: 'node-project',
+    validate(value) {
+      const folderRules = new RegExp('^[a-z0-9\\_\\-]+$');
+
+      if (value.startsWith('_') || value.startsWith('-') || value.endsWith('_') || value.endsWith('-')) {
+        return 'Do not start or end with _ , -';
+      }
+      if (!value.match(folderRules)) {
+        return 'Folder name can only contain Letters, Number, - and _';
+      }
+
+      return true;
+    },
   },
   {
     type: 'list',

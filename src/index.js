@@ -8,7 +8,7 @@ async function buildProject() {
     .catch((error) => console.error(error));
 
   handleProjectSettings(
-    answers.projectName,
+    answers.projectName.trim(),
     answers.pkgManager,
     answers.typeScript,
     answers.extraSettings
