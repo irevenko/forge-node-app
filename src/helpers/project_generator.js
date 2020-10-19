@@ -4,6 +4,7 @@ const {
   initPackage,
   installTsDependencies,
   createScripts,
+  addEslint,
 } = require('./package_manager');
 
 function createSrcFolder(projectName, typeScript) {
@@ -24,7 +25,12 @@ function initTypeScript(projectName) {
 }
 
 // eslint-disable-next-line no-unused-vars
-function handleProjectSettings(projectName, pkgManager, typeScript, settings) {
+function handleProjectSettings(
+  projectName,
+  pkgManager,
+  typeScript,
+  extraSettings
+) {
   console.log('🔨 Initializing The Package...');
   initPackage(projectName, pkgManager);
 
@@ -38,6 +44,12 @@ function handleProjectSettings(projectName, pkgManager, typeScript, settings) {
   createSrcFolder(projectName, typeScript);
   console.log('📜 Creating Scripts');
   createScripts(pkgManager, projectName, typeScript);
+
+  if (extraSettings) {
+    if (extraSettings[0]) {
+      addEslint(projectName, pkgManager);
+    }
+  }
 
   console.log(`🎊🎉 Ready!\n🚀 cd ${projectName} && ${pkgManager} start`);
 }

@@ -11,7 +11,7 @@ const questions = [
         return 'Do not start or end with _ , -';
       }
       if (!value.match(folderRules)) {
-        return 'Folder name can only contain Letters, Number, - and _';
+        return 'Folder name can only contain Letters, Numbers, - and _';
       }
 
       return true;
@@ -36,10 +36,9 @@ const questions = [
     choices: [
       'ESLint',
       'Prettier',
-      'Unit Tests',
-      'E2E Tests',
       'dotenv',
       'nodemon',
+      'Unit Tests',
     ],
   },
 ];

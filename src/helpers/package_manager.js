@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-const { execSync } = require('child_process');
+const { execSync, spawn } = require('child_process');
 const fs = require('fs');
 
 function initPackage(projectName, pkgManager) {
@@ -14,7 +14,6 @@ function installTsDependencies(pkgManager, projectName) {
   if (pkgManager === 'yarn') {
     execSync(`cd ${projectName} && yarn add typescript ts-node @types/node -D`);
   }
-  
 }
 
 function createScripts(pkgManager, projectName, typeScript) {
@@ -36,5 +35,20 @@ function createScripts(pkgManager, projectName, typeScript) {
   }
 }
 
+function addEslint(projectName, pkgManager) { 
+  console.log('Adding ESLint');
 
-module.exports = { installTsDependencies, createScripts, initPackage };
+  if (pkgManager === 'npm') { 
+    execSync(`cd ${projectName} && npm i eslint eslint-config-node eslint-plugin-node -D`);
+  }
+  if (pkgManager === 'yarn') {
+    execSync(`cd ${projectName} && yarn add eslint eslint-config-node eslint-plugin-node -D`);
+  }
+  
+  process.chdir(projectName); // Beacuse execSync does not change dir directly
+  spawn('npx', ['eslint', '--init'], {
+    stdio: 'inherit',
+  });
+}
+
+module.exports = { installTsDependencies, createScripts, initPackage, addEslint };
