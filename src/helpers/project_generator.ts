@@ -1,13 +1,13 @@
-const fs = require('fs');
-const { execSync } = require('child_process');
-const {
+import fs from 'fs';
+import { execSync } from 'child_process';
+import {
   initPackage,
   installTsDependencies,
   createScripts,
   addEslint,
-} = require('./package_manager');
+} from './package_manager';
 
-function createSrcFolder(projectName, typeScript) {
+function createSrcFolder(projectName: string, typeScript: boolean): void {
   fs.mkdirSync(`${projectName}/src`, { recursive: true });
   typeScript
     ? fs.writeFileSync(
@@ -20,24 +20,24 @@ function createSrcFolder(projectName, typeScript) {
       );
 }
 
-function initTypeScript(projectName) {
+function initTypeScript(projectName: string): void {
   execSync(`cd ${projectName} && tsc --init`);
 }
 
 // eslint-disable-next-line no-unused-vars
 function handleProjectSettings(
-  projectName,
-  pkgManager,
-  typeScript,
-  extraSettings
-) {
+  projectName: string,
+  pkgManager: string,
+  typeScript: boolean,
+  extraSettings: Array<string>
+): void {
   console.log('🔨 Initializing The Package...');
   initPackage(projectName, pkgManager);
 
   if (typeScript) {
     console.log('📥 Setting Up TypeScript');
     installTsDependencies(pkgManager, projectName);
-    initTypeScript(projectName, typeScript);
+    initTypeScript(projectName);
   }
 
   console.log('🗂  Creating Folders');
@@ -54,6 +54,4 @@ function handleProjectSettings(
   console.log(`🎊🎉 Ready!\n🚀 cd ${projectName} && ${pkgManager} start`);
 }
 
-module.exports = {
-  handleProjectSettings,
-};
+export default handleProjectSettings;

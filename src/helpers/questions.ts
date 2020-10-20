@@ -1,13 +1,26 @@
-/* eslint-disable prettier/prettier */
-const questions = [
+interface IQuestions {
+  type: string;
+  message: string;
+  name: string;
+  validate?(value: string): boolean | string;
+  choices?: Array<string>;
+  default?: boolean;
+}
+
+const questions: Array<IQuestions> = [
   {
     type: 'input',
     message: '📝 Enter project name:',
     name: 'projectName',
-    validate(value) {
+    validate(value: string): boolean | string {
       const folderRules = new RegExp('^[a-z0-9\\_\\-]+$');
 
-      if (value.startsWith('_') || value.startsWith('-') || value.endsWith('_') || value.endsWith('-')) {
+      if (
+        value.startsWith('_') ||
+        value.startsWith('-') ||
+        value.endsWith('_') ||
+        value.endsWith('-')
+      ) {
         return 'Do not start or end with _ , -';
       }
       if (!value.match(folderRules)) {
@@ -33,16 +46,8 @@ const questions = [
     type: 'checkbox',
     message: '⚙️  Pick the config:',
     name: 'extraSettings',
-    choices: [
-      'ESLint',
-      'Prettier',
-      'dotenv',
-      'nodemon',
-      'Unit Tests',
-    ],
+    choices: ['ESLint', 'Prettier', 'dotenv', 'nodemon', 'Unit Tests'],
   },
 ];
 
-module.exports = {
-  questions,
-};
+export default questions;
