@@ -4,7 +4,7 @@ import {
   initPackage,
   installTsDependencies,
   createScripts,
-  addEslint,
+  addPrettier,
 } from './package_manager';
 
 function createSrcFolder(projectName: string, typeScript: boolean): void {
@@ -24,7 +24,6 @@ function initTypeScript(projectName: string): void {
   execSync(`cd ${projectName} && tsc --init`);
 }
 
-// eslint-disable-next-line no-unused-vars
 function handleProjectSettings(
   projectName: string,
   pkgManager: string,
@@ -42,12 +41,13 @@ function handleProjectSettings(
 
   console.log('🗂  Creating Folders');
   createSrcFolder(projectName, typeScript);
+
   console.log('📜 Creating Scripts');
   createScripts(pkgManager, projectName, typeScript);
 
   if (extraSettings) {
     if (extraSettings[0]) {
-      addEslint(projectName, pkgManager);
+      addPrettier(projectName, pkgManager);
     }
   }
 

@@ -1,7 +1,7 @@
 {
   "name": "forge-node-app",
   "version": "1.0.0",
-  "description": "A Fast Way To Generate Node.js App (TS | ESLint | Prettier etc...)",
+  "description": "A Fast Way To Generate Node.js App",
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",

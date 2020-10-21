@@ -63,7 +63,7 @@ export function createScripts(
 }
 
 export function addEslint(projectName: string, pkgManager: string): void {
-  console.log('Adding ESLint');
+  console.log('🔎 Adding ESLint');
 
   if (pkgManager === 'npm') {
     execSync(
@@ -77,7 +77,18 @@ export function addEslint(projectName: string, pkgManager: string): void {
   }
 
   process.chdir(projectName); // Beacuse execSync does not change dir directly
-  spawn('npx', ['eslint', '--init'], {
-    stdio: 'inherit',
-  });
+  spawn('npx', ['eslint', '--init'], { stdio: 'inherit' });
+}
+
+export function addPrettier(projectName: string, pkgManager: string): void {
+  console.log('🧹 Adding Prettier');
+
+  if (pkgManager === 'npm') {
+    execSync(`cd ${projectName} && npm i prettier -D`);
+  }
+  if (pkgManager === 'yarn') {
+    execSync(`cd ${projectName} && yarn add prettier -D`);
+  }
+
+  fs.writeFileSync(`./${projectName}/.prettierrc`, '{\n"singleQuote": true\n}');
 }
