@@ -3,8 +3,10 @@ import { execSync } from 'child_process';
 import {
   initPackage,
   installTsDependencies,
-  createScripts,
+  createInitialScripts,
   addPrettier,
+  addEslint,
+  attachLinterWithPrettier,
 } from './package_manager';
 
 function createSrcFolder(projectName: string, typeScript: boolean): void {
@@ -43,15 +45,27 @@ function handleProjectSettings(
   createSrcFolder(projectName, typeScript);
 
   console.log('📜 Creating Scripts');
-  createScripts(pkgManager, projectName, typeScript);
+  createInitialScripts(pkgManager, projectName, typeScript);
 
   if (extraSettings) {
-    if (extraSettings[0]) {
+    if (
+      extraSettings.includes('ESLint') &&
+      extraSettings.includes('Prettier')
+    ) {
       addPrettier(projectName, pkgManager);
+      attachLinterWithPrettier(projectName, pkgManager);
+      addEslint(projectName, projectName);
+      console.log(`🎊🎉 Ready!\n🚀 cd ${projectName} && ${pkgManager} start`);
+    }
+    if (extraSettings.includes('ESLint')) {
+      addEslint(projectName, projectName);
+      console.log(`🎊🎉 Ready!\n🚀 cd ${projectName} && ${pkgManager} start`);
+    }
+    if (extraSettings.includes('Prettier')) {
+      addPrettier(projectName, projectName);
+      console.log(`🎊🎉 Ready!\n🚀 cd ${projectName} && ${pkgManager} start`);
     }
   }
-
-  console.log(`🎊🎉 Ready!\n🚀 cd ${projectName} && ${pkgManager} start`);
 }
 
 export default handleProjectSettings;

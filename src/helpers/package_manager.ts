@@ -25,7 +25,7 @@ export function installTsDependencies(
   }
 }
 
-export function createScripts(
+export function createInitialScripts(
   pkgManager: string,
   projectName: string,
   typeScript: boolean
@@ -90,5 +90,26 @@ export function addPrettier(projectName: string, pkgManager: string): void {
     execSync(`cd ${projectName} && yarn add prettier -D`);
   }
 
-  fs.writeFileSync(`./${projectName}/.prettierrc`, '{\n"singleQuote": true\n}');
+  fs.writeFileSync(
+    `./${projectName}/.prettierrc`,
+    '{\n\t"singleQuote": true\n}'
+  );
+}
+
+export function attachLinterWithPrettier(
+  projectName: string,
+  pkgManager: string
+): void {
+  console.log('🖇 Connecting ESLint with Prettier');
+
+  if (pkgManager === 'npm') {
+    execSync(
+      `cd ${projectName} && npm i eslint-config-prettier eslint-plugin-prettier -D`
+    );
+  }
+  if (pkgManager === 'yarn') {
+    execSync(
+      `cd ${projectName} && yarn add eslint-config-prettier eslint-plugin-prettier -D`
+    );
+  }
 }
