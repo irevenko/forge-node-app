@@ -4,6 +4,7 @@ A Fast Way to Generate Node Boilerplate With Your Favorite Development Tools and
 
 # ToDo
 
+- Rewrite with classes?
 - Init Prettier + ESLint, Tests
 - Add build watch dev fix test scripts
 - Update eslintrc after installation

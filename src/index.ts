@@ -1,6 +1,6 @@
 import inquirer from 'inquirer';
-import questions from './helpers/questions';
-import handleProjectSettings from './helpers/project_generator';
+import questions from './questions';
+import handleProjectSettings from './project_generator';
 
 interface IAnswers {
   projectName: string;

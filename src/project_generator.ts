@@ -1,15 +1,18 @@
 import fs from 'fs';
 import { execSync } from 'child_process';
 import {
-  initPackage,
   installTsDependencies,
-  createInitialScripts,
   addPrettier,
   addEslint,
   attachLinterWithPrettier,
-} from './package_manager';
+} from './dependencies';
+import { createInitialScripts, initPackage } from './package_manager';
 
-function createSrcFolder(projectName: string, typeScript: boolean): void {
+function initTypeScript(projectName: string): void {
+  execSync(`cd ${projectName} && tsc --init`);
+}
+
+function createSourceFolder(projectName: string, typeScript: boolean): void {
   fs.mkdirSync(`${projectName}/src`, { recursive: true });
   typeScript
     ? fs.writeFileSync(
@@ -20,10 +23,6 @@ function createSrcFolder(projectName: string, typeScript: boolean): void {
         `./${projectName}/src/index.js`,
         'const n = 5;\nconsole.log(n);'
       );
-}
-
-function initTypeScript(projectName: string): void {
-  execSync(`cd ${projectName} && tsc --init`);
 }
 
 function handleProjectSettings(
@@ -42,7 +41,7 @@ function handleProjectSettings(
   }
 
   console.log('🗂  Creating Folders');
-  createSrcFolder(projectName, typeScript);
+  createSourceFolder(projectName, typeScript);
 
   console.log('📜 Creating Scripts');
   createInitialScripts(pkgManager, projectName, typeScript);
