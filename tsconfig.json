@@ -1,6 +1,7 @@
 {
   "extends": "@tsconfig/node14/tsconfig.json",
   "compilerOptions": {
-    "outDir": "./out"
+    "outDir": "./out",
+    "esModuleInterop": true
   }
 }

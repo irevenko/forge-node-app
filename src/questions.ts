@@ -1,11 +1,4 @@
-interface IQuestions {
-  type: string;
-  message: string;
-  name: string;
-  validate?(value: string): boolean | string;
-  choices?: Array<string>;
-  default?: boolean;
-}
+import { IQuestions } from './interfaces';
 
 const questions: Array<IQuestions> = [
   {
