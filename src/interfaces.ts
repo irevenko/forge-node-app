@@ -16,7 +16,13 @@ export interface IAnswers {
 
 export interface IPackage {
   scripts: {
-    start: string;
+    start?: string;
+    dev?: string;
+    build?: string;
+    test?: string;
+    watch?: string;
+    lint?: string;
+    format?: string;
   };
   main: string;
 }

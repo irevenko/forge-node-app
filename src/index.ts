@@ -8,8 +8,7 @@ async function buildProject(): Promise<void> {
     .prompt(questions)
     .catch((error) => console.error(error));
 
-  // eslint-disable-next-line no-new
-  new ProjectGenerator(
+  ProjectGenerator.handleProjectSettings(
     answers.projectName.trim(),
     answers.pkgManager,
     answers.typeScript,

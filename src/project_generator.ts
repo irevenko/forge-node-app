@@ -3,25 +3,20 @@ import { execSync } from 'child_process';
 import PackageManager from './package_manager';
 
 class ProjectGenerator {
-  constructor(
-    readonly projectName: string,
-    readonly pkgManager: string,
-    readonly typeScript: boolean,
-    readonly extraSettings?: Array<string>
-  ) {
-    console.log('🔨 Initializing The Package...');
+  static handleProjectSettings(
+    projectName: string,
+    pkgManager: string,
+    typeScript: boolean,
+    extraSettings?: Array<string>
+  ): void {
     PackageManager.initPackage(projectName, pkgManager);
 
     if (typeScript) {
-      console.log('📥 Setting Up TypeScript');
       PackageManager.installTsDependencies(pkgManager, projectName);
       ProjectGenerator.initTypeScript(projectName);
     }
 
-    console.log('🗂  Creating Folders');
     ProjectGenerator.createSourceFolder(projectName, typeScript);
-
-    console.log('📜 Creating Scripts');
     PackageManager.createInitialScripts(pkgManager, projectName, typeScript);
 
     if (extraSettings) {
@@ -31,13 +26,16 @@ class ProjectGenerator {
       ) {
         PackageManager.addPrettier(projectName, pkgManager);
         PackageManager.attachLinterWithPrettier(projectName, pkgManager);
-        PackageManager.addEslint(projectName, projectName);
+        PackageManager.addEslint(projectName, pkgManager);
       }
       if (extraSettings.includes('ESLint')) {
-        PackageManager.addEslint(projectName, projectName);
+        PackageManager.addEslint(projectName, pkgManager);
       }
       if (extraSettings.includes('Prettier')) {
-        PackageManager.addPrettier(projectName, projectName);
+        PackageManager.addPrettier(projectName, pkgManager);
+      }
+      if (extraSettings.includes('dotenv')) {
+        PackageManager.addDotenv(projectName, pkgManager, typeScript);
       }
     }
     console.log(`🎊🎉 Ready!\n🚀 cd ${projectName} && ${pkgManager} start`);
@@ -48,6 +46,7 @@ class ProjectGenerator {
   }
 
   static createSourceFolder(projectName: string, typeScript: boolean): void {
+    console.log('🗂  Creating Folders');
     fs.mkdirSync(`${projectName}/src`, { recursive: true });
     typeScript
       ? fs.writeFileSync(
