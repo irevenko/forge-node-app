@@ -1,4 +1,6 @@
 import fs from 'fs';
+import chalk from 'chalk';
+import ora from 'ora';
 import { execSync } from 'child_process';
 import PackageManager from './package_manager';
 
@@ -17,7 +19,7 @@ class ProjectGenerator {
     }
 
     ProjectGenerator.createSourceFolder(projectName, typeScript);
-    PackageManager.createInitialScripts(pkgManager, projectName, typeScript);
+    PackageManager.createInitialScripts(projectName, typeScript);
 
     if (extraSettings) {
       if (
@@ -38,15 +40,20 @@ class ProjectGenerator {
         PackageManager.addDotenv(projectName, pkgManager, typeScript);
       }
     }
-    console.log(`🎊🎉 Ready!\n🚀 cd ${projectName} && ${pkgManager} start`);
+
+    console.log(chalk.greenBright('🎉 Ready!'));
+    console.log(
+      chalk.greenBright(`🚀 cd ${projectName} && ${pkgManager} start`)
+    );
   }
 
   static initTypeScript(projectName: string): void {
-    execSync(`cd ${projectName} && npx tsc --init`);
+    execSync(`cd ${projectName} && npx tsc --init`, { stdio: 'ignore' });
   }
 
   static createSourceFolder(projectName: string, typeScript: boolean): void {
-    console.log('🗂  Creating Folders');
+    const srcSpinner = ora('📂 Creating Folders...').start();
+
     fs.mkdirSync(`${projectName}/src`, { recursive: true });
     typeScript
       ? fs.writeFileSync(
@@ -57,6 +64,8 @@ class ProjectGenerator {
           `./${projectName}/src/index.js`,
           'const n = 5;\nconsole.log(n);'
         );
+
+    srcSpinner.succeed('📂 Created Folders');
   }
 }
 
