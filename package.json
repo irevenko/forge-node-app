@@ -4,9 +4,10 @@
   "description": "A Fast Way To Generate Node.js App",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "node out/index.js",
+    "dev": "ts-node src/index.ts",
     "format": "prettier 'src/*.ts' --write",
-    "lint-fix": "eslint src/*.ts --fix"
+    "linter:fix": "eslint src/*.ts --fix"
   },
   "repository": {
     "type": "git",
@@ -25,7 +26,7 @@
   "devDependencies": {
     "@tsconfig/node14": "^1.0.0",
     "@types/inquirer": "^7.3.1",
-    "@types/node": "^14.11.11",
+    "@types/node": "^14.14.5",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
     "eslint": "^7.11.0",
@@ -37,7 +38,7 @@
     "eslint-plugin-prettier": "^3.1.4",
     "prettier": "^2.1.2",
     "ts-node": "^9.0.0",
-    "typescript": "^4.0.3"
+    "typescript": "^4.0.5"
   },
   "dependencies": {
     "chalk": "^4.1.0",

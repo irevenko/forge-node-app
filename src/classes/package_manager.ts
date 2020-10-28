@@ -1,7 +1,18 @@
 import fs from 'fs';
 import ora from 'ora';
 import { execSync, spawn } from 'child_process';
-import { IPackage } from './interfaces';
+import { IPackage } from '../interfaces';
+import {
+  eslintDependencies,
+  lintFormatDependencies,
+  tsDependencies,
+} from '../config/dependencies';
+import {
+  dotenvJsFile,
+  dotenvFile,
+  dotenvTsFile,
+  prettierConfig,
+} from '../config/misc';
 
 class PackageManager {
   static initPackage(projectName: string, pkgManager: string): void {
@@ -44,15 +55,14 @@ class PackageManager {
     const tsSpinner = ora('📥 Setting Up TypeScript...').start();
 
     if (pkgManager === 'npm') {
-      execSync(`cd ${projectName} && npm i typescript ts-node @types/node -D`, {
+      execSync(`cd ${projectName} && npm i ${tsDependencies}`, {
         stdio: 'ignore',
       });
     }
     if (pkgManager === 'yarn') {
-      execSync(
-        `cd ${projectName} && yarn add typescript ts-node @types/node -D`,
-        { stdio: 'ignore' }
-      );
+      execSync(`cd ${projectName} && yarn add ${tsDependencies}`, {
+        stdio: 'ignore',
+      });
     }
 
     tsSpinner.succeed('📥 Set Up TypeScript');
@@ -62,16 +72,14 @@ class PackageManager {
     const linterSpinner = ora('🔎 Adding ESLint...').start();
 
     if (pkgManager === 'npm') {
-      execSync(
-        `cd ${projectName} && npm i eslint eslint-config-node eslint-plugin-node -D`,
-        { stdio: 'ignore' }
-      );
+      execSync(`cd ${projectName} && npm i ${eslintDependencies} -D`, {
+        stdio: 'ignore',
+      });
     }
     if (pkgManager === 'yarn') {
-      execSync(
-        `cd ${projectName} && yarn add eslint eslint-config-node eslint-plugin-node -D`,
-        { stdio: 'ignore' }
-      );
+      execSync(`cd ${projectName} && yarn add ${eslintDependencies} -D`, {
+        stdio: 'ignore',
+      });
     }
 
     linterSpinner.succeed('🔎 Added ESLint');
@@ -91,10 +99,7 @@ class PackageManager {
       });
     }
 
-    fs.writeFileSync(
-      `./${projectName}/.prettierrc`,
-      '{\n\t"singleQuote": true\n}'
-    );
+    fs.writeFileSync(`./${projectName}/.prettierrc`, prettierConfig);
 
     prettierSpinner.succeed('🧹 Added Prettier');
   }
@@ -108,16 +113,14 @@ class PackageManager {
     ).start();
 
     if (pkgManager === 'npm') {
-      execSync(
-        `cd ${projectName} && npm i eslint-config-prettier eslint-plugin-prettier -D`,
-        { stdio: 'ignore' }
-      );
+      execSync(`cd ${projectName} && npm i ${lintFormatDependencies} -D`, {
+        stdio: 'ignore',
+      });
     }
     if (pkgManager === 'yarn') {
-      execSync(
-        `cd ${projectName} && yarn add eslint-config-prettier eslint-plugin-prettier -D`,
-        { stdio: 'ignore' }
-      );
+      execSync(`cd ${projectName} && yarn add ${lintFormatDependencies} -D`, {
+        stdio: 'ignore',
+      });
     }
 
     linterPrettierSpinner.succeed('🖇 Connected ESLint with Prettier');
@@ -141,16 +144,10 @@ class PackageManager {
       });
     }
 
-    fs.writeFileSync(`./${projectName}/.env`, 'MSG=HelloWorld');
+    fs.writeFileSync(`./${projectName}/.env`, dotenvFile);
     typeScript
-      ? fs.writeFileSync(
-          `./${projectName}/src/index.ts`,
-          "import 'dotenv/config'\nconsole.log(process.env.MSG);"
-        )
-      : fs.writeFileSync(
-          `./${projectName}/src/index.js`,
-          "require('dotenv').config()\nconsole.log(process.env.MSG);"
-        );
+      ? fs.writeFileSync(`./${projectName}/src/index.ts`, dotenvTsFile)
+      : fs.writeFileSync(`./${projectName}/src/index.js`, dotenvJsFile);
 
     dotenvSpinner.succeed('🔒 Added Dotenv');
   }

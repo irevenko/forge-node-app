@@ -3,6 +3,7 @@ import chalk from 'chalk';
 import ora from 'ora';
 import { execSync } from 'child_process';
 import PackageManager from './package_manager';
+import { defaultJsFile, defaultTsFile } from '../config/misc';
 
 class ProjectGenerator {
   static handleProjectSettings(
@@ -22,19 +23,17 @@ class ProjectGenerator {
     PackageManager.createInitialScripts(projectName, typeScript);
 
     if (extraSettings) {
-      if (
-        extraSettings.includes('ESLint') &&
-        extraSettings.includes('Prettier')
-      ) {
-        PackageManager.addPrettier(projectName, pkgManager);
-        PackageManager.attachLinterWithPrettier(projectName, pkgManager);
-        PackageManager.addEslint(projectName, pkgManager);
-      }
       if (extraSettings.includes('ESLint')) {
         PackageManager.addEslint(projectName, pkgManager);
       }
       if (extraSettings.includes('Prettier')) {
         PackageManager.addPrettier(projectName, pkgManager);
+      }
+      if (
+        extraSettings.includes('ESLint') &&
+        extraSettings.includes('Prettier')
+      ) {
+        PackageManager.attachLinterWithPrettier(projectName, pkgManager);
       }
       if (extraSettings.includes('dotenv')) {
         PackageManager.addDotenv(projectName, pkgManager, typeScript);
@@ -56,14 +55,8 @@ class ProjectGenerator {
 
     fs.mkdirSync(`${projectName}/src`, { recursive: true });
     typeScript
-      ? fs.writeFileSync(
-          `./${projectName}/src/index.ts`,
-          'const n: number = 5;\nconsole.log(n);'
-        )
-      : fs.writeFileSync(
-          `./${projectName}/src/index.js`,
-          'const n = 5;\nconsole.log(n);'
-        );
+      ? fs.writeFileSync(`./${projectName}/src/index.ts`, defaultTsFile)
+      : fs.writeFileSync(`./${projectName}/src/index.js`, defaultJsFile);
 
     srcSpinner.succeed('📂 Created Folders');
   }

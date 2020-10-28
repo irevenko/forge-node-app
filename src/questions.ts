@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { IQuestions } from './interfaces';
 
 const questions: Array<IQuestions> = [
@@ -8,16 +9,21 @@ const questions: Array<IQuestions> = [
     validate(value: string): boolean | string {
       const folderRules = new RegExp('^[a-z0-9\\_\\-]+$');
 
+      if (fs.existsSync(value)) {
+        return '📁 Directory already exists!';
+      }
+
       if (
         value.startsWith('_') ||
         value.startsWith('-') ||
         value.endsWith('_') ||
         value.endsWith('-')
       ) {
-        return 'Do not start or end with _ , -';
+        return '❌ Do not start or end with _ , -';
       }
+
       if (!value.match(folderRules)) {
-        return 'Folder name can only contain Letters, Numbers, - and _';
+        return '❌ Folder name can only contain Letters, Numbers, - and _';
       }
 
       return true;
