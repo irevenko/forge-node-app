@@ -45,7 +45,13 @@ const questions: Array<IQuestions> = [
     type: 'checkbox',
     message: '⚙️  Pick the config:',
     name: 'extraSettings',
-    choices: ['ESLint', 'Prettier', 'dotenv', 'nodemon', 'Unit Tests'],
+    choices: [
+      'ESLint',
+      'Prettier',
+      'dotenv',
+      'nodemon || ts-node-dev',
+      'Unit Tests',
+    ],
   },
 ];
 

@@ -20,12 +20,10 @@ class ProjectGenerator {
     }
 
     ProjectGenerator.createSourceFolder(projectName, typeScript);
-    PackageManager.createInitialScripts(projectName, typeScript);
+    PackageManager.addPackageDetails(projectName);
+    PackageManager.createScripts(projectName, typeScript, extraSettings);
 
     if (extraSettings) {
-      if (extraSettings.includes('ESLint')) {
-        PackageManager.addEslint(projectName, pkgManager);
-      }
       if (extraSettings.includes('Prettier')) {
         PackageManager.addPrettier(projectName, pkgManager);
       }
@@ -37,6 +35,12 @@ class ProjectGenerator {
       }
       if (extraSettings.includes('dotenv')) {
         PackageManager.addDotenv(projectName, pkgManager, typeScript);
+      }
+      if (extraSettings.includes('nodemon || ts-node-dev')) {
+        PackageManager.addChangesMonitor(projectName, pkgManager, typeScript);
+      }
+      if (extraSettings.includes('ESLint')) {
+        PackageManager.addEslint(projectName, pkgManager);
       }
     }
 

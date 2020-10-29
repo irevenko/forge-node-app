@@ -15,14 +15,21 @@ export interface IAnswers {
 }
 
 export interface IPackage {
+  description?: string;
+  author?: string;
+  keywords?: Array<string>;
+  license?: string;
+  // repository: {type, url} bugs {url}
+  main: string;
   scripts: {
+    'start:source'?: string;
     start?: string;
     dev?: string;
     build?: string;
     test?: string;
     watch?: string;
-    lint?: string;
     format?: string;
+    lint?: string;
+    'lint:fix'?: string;
   };
-  main: string;
 }

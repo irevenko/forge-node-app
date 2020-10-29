@@ -3,15 +3,15 @@
 A Fast Way to Generate Node Boilerplate With Your Favorite Development Tools and Libs
 
 # ToDo
-- Add another spinner
+- Ask: do you want to install ts and ts-node globally? 
+- New tsconf for TS projects
 - Init git
-- Add scripts
-- Add eslintignore, prettierignore, gitignore, LICENSE
+- Add eslintignore, prettierignore, gitignore, LICENSE README
 - JUST ASK DO YOU WANT TO ANSWER ESLINT QUESTIONS OR GO WITH DEFAULTS
 - Init Prettier + ESLint
 - Improve ESLint with plugins, extends, Update eslintrc after installation
-- New tsconf for TS projects
-- Add Webpack (rollup, gulp), Babel, Tests
-- Add nodemon
+- Add Webpack (rollup, parcel, gulp), Babel, Tests
+- Add yargs (all questions but with args)
 - Fix ora with async
+- Add another spinner
 - Add logo

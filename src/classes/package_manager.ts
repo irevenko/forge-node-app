@@ -24,7 +24,11 @@ class PackageManager {
     packageSpinner.succeed('🔨 Initialized The Package');
   }
 
-  static createInitialScripts(projectName: string, typeScript: boolean): void {
+  static createScripts(
+    projectName: string,
+    typeScript: boolean,
+    extraSettings?: Array<string>
+  ): void {
     const scriptsSpinner = ora('📜 Creating Scripts...').start();
 
     const pkgJSON: IPackage = JSON.parse(
@@ -41,6 +45,29 @@ class PackageManager {
 
     if (typeScript) {
       pkgJSON.scripts.build = 'tsc';
+      pkgJSON.scripts.watch = 'tsc src/*.ts --watch';
+      pkgJSON.scripts['start:source'] = 'tsc && node out/index.js';
+    }
+
+    if (extraSettings!.includes('ESLint')) {
+      typeScript
+        ? (pkgJSON.scripts.lint = 'eslint src/*.ts')
+        : (pkgJSON.scripts.lint = 'eslint src/*.js');
+      typeScript
+        ? (pkgJSON.scripts['lint:fix'] = 'eslint src/*.ts --fix')
+        : (pkgJSON.scripts['lint:fix'] = 'eslint src/*.js --fix');
+    }
+
+    if (extraSettings!.includes('Prettier')) {
+      typeScript
+        ? (pkgJSON.scripts.format = "prettier 'src/*.ts' --write")
+        : (pkgJSON.scripts.format = "prettier 'src/*.js' --write");
+    }
+
+    if (extraSettings!.includes('nodemon || ts-node-dev')) {
+      typeScript
+        ? (pkgJSON.scripts.dev = 'ts-node-dev src/')
+        : (pkgJSON.scripts.dev = 'nodemon src/');
     }
 
     fs.writeFileSync(
@@ -49,6 +76,25 @@ class PackageManager {
     );
 
     scriptsSpinner.succeed('📜 Created Scripts');
+  }
+
+  static addPackageDetails(projectName: string): void {
+    const scriptsSpinner = ora('📋 Adding Package Details...').start();
+
+    const pkgJSON: IPackage = JSON.parse(
+      fs.readFileSync(`${projectName}/package.json`, 'utf8')
+    );
+
+    pkgJSON.description = '<YOUR DESCRIPTION>';
+    pkgJSON.author = '<YOUR CREDENTIALS>';
+    pkgJSON.keywords = ['key', 'words'];
+
+    fs.writeFileSync(
+      `${projectName}/package.json`,
+      JSON.stringify(pkgJSON, null, 2)
+    );
+
+    scriptsSpinner.succeed('📋 Added Package Details');
   }
 
   static installTsDependencies(pkgManager: string, projectName: string): void {
@@ -134,12 +180,12 @@ class PackageManager {
     const dotenvSpinner = ora('🔒 Adding Dotenv...').start();
 
     if (pkgManager === 'npm') {
-      execSync(`cd ${projectName} && npm i dotenv --save`, {
+      execSync(`cd ${projectName} && npm i dotenv -D`, {
         stdio: 'ignore',
       });
     }
     if (pkgManager === 'yarn') {
-      execSync(`cd ${projectName} && yarn add dotenv --save`, {
+      execSync(`cd ${projectName} && yarn add dotenv -D`, {
         stdio: 'ignore',
       });
     }
@@ -150,6 +196,35 @@ class PackageManager {
       : fs.writeFileSync(`./${projectName}/src/index.js`, dotenvJsFile);
 
     dotenvSpinner.succeed('🔒 Added Dotenv');
+  }
+
+  static addChangesMonitor(
+    projectName: string,
+    pkgManager: string,
+    typeScript: boolean
+  ): void {
+    const nodemonSpinner = ora('🔁 Adding Changes Montitor...').start();
+
+    if (pkgManager === 'npm') {
+      typeScript
+        ? execSync(`cd ${projectName} && npm i ts-node-dev -D`, {
+            stdio: 'ignore',
+          })
+        : execSync(`cd ${projectName} && npm i nodemon -D`, {
+            stdio: 'ignore',
+          });
+    }
+    if (pkgManager === 'yarn') {
+      typeScript
+        ? execSync(`cd ${projectName} && yarn add ts-node-dev -D`, {
+            stdio: 'ignore',
+          })
+        : execSync(`cd ${projectName} && yarn add nodemon -D`, {
+            stdio: 'ignore',
+          });
+    }
+
+    nodemonSpinner.succeed('🔁 Added Changes Monitor');
   }
 }
 
