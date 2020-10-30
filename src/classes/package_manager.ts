@@ -27,7 +27,8 @@ class PackageManager {
   static createScripts(
     projectName: string,
     typeScript: boolean,
-    extraSettings?: Array<string>
+    extraSettings?: Array<string>,
+    tests?: string
   ): void {
     const scriptsSpinner = ora('📜 Creating Scripts...').start();
 
@@ -49,6 +50,10 @@ class PackageManager {
       pkgJSON.scripts['start:source'] = 'tsc && node out/index.js';
     }
 
+    if (tests === 'Jest') {
+      pkgJSON.scripts.test = 'npx jest';
+    }
+
     if (extraSettings!.includes('ESLint')) {
       typeScript
         ? (pkgJSON.scripts.lint = 'eslint src/*.ts')
@@ -64,7 +69,7 @@ class PackageManager {
         : (pkgJSON.scripts.format = "prettier 'src/*.js' --write");
     }
 
-    if (extraSettings!.includes('nodemon || ts-node-dev')) {
+    if (extraSettings!.includes('nodemon or ts-node-dev')) {
       typeScript
         ? (pkgJSON.scripts.dev = 'ts-node-dev src/')
         : (pkgJSON.scripts.dev = 'nodemon src/');
@@ -85,8 +90,8 @@ class PackageManager {
       fs.readFileSync(`${projectName}/package.json`, 'utf8')
     );
 
-    pkgJSON.description = '<YOUR DESCRIPTION>';
-    pkgJSON.author = '<YOUR CREDENTIALS>';
+    pkgJSON.description = 'YOUR DESCRIPTION';
+    pkgJSON.author = 'YOUR NAME <YOUR EMAIL>';
     pkgJSON.keywords = ['key', 'words'];
 
     fs.writeFileSync(
@@ -223,8 +228,41 @@ class PackageManager {
             stdio: 'ignore',
           });
     }
-
     nodemonSpinner.succeed('🔁 Added Changes Monitor');
+  }
+
+  static addJest(
+    projectName: string,
+    pkgManager: string,
+    typeScript: boolean
+  ): void {
+    const nodemonSpinner = ora('🃏 Adding Jest...').start();
+
+    if (pkgManager === 'npm') {
+      typeScript
+        ? execSync(`cd ${projectName} && npm i jest @types/jest ts-jest -D`, {
+            stdio: 'ignore',
+          })
+        : execSync(`cd ${projectName} && npm i jest -D`, {
+            stdio: 'ignore',
+          });
+    }
+    if (pkgManager === 'yarn') {
+      typeScript
+        ? execSync(
+            `cd ${projectName} && yarn add jest @types/jest ts-jest -D`,
+            { stdio: 'ignore' }
+          )
+        : execSync(`cd ${projectName} && yarn add jest -D`, {
+            stdio: 'ignore',
+          });
+    }
+
+    if (typeScript) {
+      execSync(`cd ${projectName} && npx ts-jest config:init`);
+    }
+
+    nodemonSpinner.succeed('🃏 Added Jest');
   }
 }
 

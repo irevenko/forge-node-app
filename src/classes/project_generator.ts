@@ -1,16 +1,22 @@
 import fs from 'fs';
-import chalk from 'chalk';
 import ora from 'ora';
+import chalk from 'chalk';
 import { execSync } from 'child_process';
 import PackageManager from './package_manager';
-import { defaultJsFile, defaultTsFile } from '../config/misc';
+import {
+  defaultJsFile,
+  defaultTsFile,
+  jestJsFile,
+  jestTsFile,
+} from '../config/misc';
 
 class ProjectGenerator {
   static handleProjectSettings(
     projectName: string,
     pkgManager: string,
     typeScript: boolean,
-    extraSettings?: Array<string>
+    extraSettings?: Array<string>,
+    tests?: string
   ): void {
     PackageManager.initPackage(projectName, pkgManager);
 
@@ -21,7 +27,12 @@ class ProjectGenerator {
 
     ProjectGenerator.createSourceFolder(projectName, typeScript);
     PackageManager.addPackageDetails(projectName);
-    PackageManager.createScripts(projectName, typeScript, extraSettings);
+    PackageManager.createScripts(projectName, typeScript, extraSettings, tests);
+
+    if (tests === 'Jest') {
+      ProjectGenerator.createTestsFolder(projectName, typeScript);
+      PackageManager.addJest(projectName, pkgManager, typeScript);
+    }
 
     if (extraSettings) {
       if (extraSettings.includes('Prettier')) {
@@ -36,7 +47,7 @@ class ProjectGenerator {
       if (extraSettings.includes('dotenv')) {
         PackageManager.addDotenv(projectName, pkgManager, typeScript);
       }
-      if (extraSettings.includes('nodemon || ts-node-dev')) {
+      if (extraSettings.includes('nodemon or ts-node-dev')) {
         PackageManager.addChangesMonitor(projectName, pkgManager, typeScript);
       }
       if (extraSettings.includes('ESLint')) {
@@ -55,14 +66,27 @@ class ProjectGenerator {
   }
 
   static createSourceFolder(projectName: string, typeScript: boolean): void {
-    const srcSpinner = ora('📂 Creating Folders...').start();
+    const srcSpinner = ora('📂 Creating Source Folder...').start();
 
     fs.mkdirSync(`${projectName}/src`, { recursive: true });
     typeScript
       ? fs.writeFileSync(`./${projectName}/src/index.ts`, defaultTsFile)
       : fs.writeFileSync(`./${projectName}/src/index.js`, defaultJsFile);
 
-    srcSpinner.succeed('📂 Created Folders');
+    srcSpinner.succeed('📂 Created Source Folder');
+  }
+
+  static createTestsFolder(projectName: string, typeScript: boolean): void {
+    const srcSpinner = ora('📂 Creating Tests Folder...').start();
+
+    fs.mkdirSync(`${projectName}/__tests__`, { recursive: true });
+    typeScript
+      ? fs.writeFileSync(`./${projectName}/__tests__/index.test.ts`, jestTsFile)
+      : fs.writeFileSync(
+          `./${projectName}/__tests__/index.test.js`,
+          jestJsFile
+        );
+    srcSpinner.succeed('📂 Created Tests Folder');
   }
 }
 
