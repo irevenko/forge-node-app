@@ -40,6 +40,12 @@ async function buildProject(): Promise<void> {
         choices: ['npm', 'yarn'],
       },
       {
+        type: 'list',
+        message: '📦 Do you want to answer package manager questions?',
+        name: 'pkgQuestions',
+        choices: ['Go with defaults', 'Answer questions'],
+      },
+      {
         type: 'confirm',
         message: '🤓 Will you use TypeScript?',
         name: 'typeScript',
@@ -75,12 +81,22 @@ async function buildProject(): Promise<void> {
           return allAnswers.extraSettings.includes('Unit Tests');
         },
       },
+      {
+        type: 'list',
+        message: '♻️  Do you want to answer ESLint questions?',
+        name: 'eslintQuestions',
+        choices: ['Go with defaults', 'Answer questions'],
+        when(allAnswers): boolean {
+          return allAnswers.extraSettings.includes('ESLint');
+        },
+      },
     ])
     .catch((error) => console.error(error));
 
   ProjectGenerator.handleProjectSettings(
     answers.projectName.trim(),
     answers.pkgManager,
+    answers.pkgQuestions,
     answers.typeScript,
     answers.extraSettings,
     answers.tests

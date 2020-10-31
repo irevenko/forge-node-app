@@ -15,12 +15,21 @@ import {
 } from '../config/misc';
 
 class PackageManager {
-  static initPackage(projectName: string, pkgManager: string): void {
+  static initPackage(
+    projectName: string,
+    pkgManager: string,
+    pkgQuestions: string
+  ): void {
     const packageSpinner = ora('🔨 Initializing The Package...').start();
 
     fs.mkdirSync(projectName);
-    execSync(`cd ${projectName} && ${pkgManager} init -y`, { stdio: 'ignore' });
-
+    if (pkgQuestions === 'Go with defaults') {
+      execSync(`cd ${projectName} && ${pkgManager} init -y`, {
+        stdio: 'ignore',
+      });
+    } else {
+      execSync(`cd ${projectName} && ${pkgManager} init`, { stdio: 'inherit' });
+    }
     packageSpinner.succeed('🔨 Initialized The Package');
   }
 

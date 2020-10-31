@@ -1,6 +1,7 @@
 export interface IAnswers {
   projectName: string;
   pkgManager: string;
+  pkgQuestions: string;
   typeScript: boolean;
   extraSettings?: Array<string>;
   tests?: string;

@@ -14,11 +14,12 @@ class ProjectGenerator {
   static handleProjectSettings(
     projectName: string,
     pkgManager: string,
+    pkgQuestions: string,
     typeScript: boolean,
     extraSettings?: Array<string>,
     tests?: string
   ): void {
-    PackageManager.initPackage(projectName, pkgManager);
+    PackageManager.initPackage(projectName, pkgManager, pkgQuestions);
 
     if (typeScript) {
       PackageManager.installTsDependencies(pkgManager, projectName);
