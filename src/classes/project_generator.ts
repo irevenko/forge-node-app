@@ -15,6 +15,7 @@ class ProjectGenerator {
     projectName: string,
     pkgManager: string,
     pkgQuestions: string,
+    eslintQuestions: string,
     typeScript: boolean,
     extraSettings?: Array<string>,
     tests?: string
@@ -52,7 +53,13 @@ class ProjectGenerator {
         PackageManager.addChangesMonitor(projectName, pkgManager, typeScript);
       }
       if (extraSettings.includes('ESLint')) {
-        PackageManager.addEslint(projectName, pkgManager);
+        PackageManager.addEslint(
+          projectName,
+          pkgManager,
+          eslintQuestions,
+          typeScript,
+          extraSettings.includes('Prettier')
+        );
       }
     }
 

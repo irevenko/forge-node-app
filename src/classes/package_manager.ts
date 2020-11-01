@@ -1,9 +1,12 @@
+/* eslint-disable no-lonely-if */
+/* eslint-disable @typescript-eslint/no-var-requires */
 import fs from 'fs';
 import ora from 'ora';
 import { execSync, spawn } from 'child_process';
 import { IPackage } from '../interfaces';
 import {
   eslintDependencies,
+  eslintTsDependencies,
   lintFormatDependencies,
   tsDependencies,
 } from '../config/dependencies';
@@ -13,6 +16,10 @@ import {
   dotenvTsFile,
   prettierConfig,
 } from '../config/misc';
+import esjs from '../config/eslint/eslint_js';
+import ests from '../config/eslint/eslint_ts';
+import esjsPretty from '../config/eslint/eslint_prettier_js';
+import estsPretty from '../config/eslint/eslint_prettier_ts';
 
 class PackageManager {
   static initPackage(
@@ -128,23 +135,64 @@ class PackageManager {
     tsSpinner.succeed('📥 Set Up TypeScript');
   }
 
-  static addEslint(projectName: string, pkgManager: string): void {
+  static addEslint(
+    projectName: string,
+    pkgManager: string,
+    eslintQuestions: string,
+    typeScript: boolean,
+    prettier: boolean
+  ): void {
     const linterSpinner = ora('🔎 Adding ESLint...').start();
 
     if (pkgManager === 'npm') {
       execSync(`cd ${projectName} && npm i ${eslintDependencies} -D`, {
         stdio: 'ignore',
       });
+      if (typeScript) {
+        execSync(`cd ${projectName} && npm i ${eslintTsDependencies} -D`, {
+          stdio: 'ignore',
+        });
+      }
     }
     if (pkgManager === 'yarn') {
       execSync(`cd ${projectName} && yarn add ${eslintDependencies} -D`, {
         stdio: 'ignore',
       });
+      if (typeScript) {
+        execSync(`cd ${projectName} && yarn add ${eslintTsDependencies} -D`, {
+          stdio: 'ignore',
+        });
+      }
+    }
+
+    if (eslintQuestions === 'Answer questions') {
+      process.chdir(projectName); // Beacuse execSync does not change dir directly
+      spawn('npx', ['eslint', '--init'], { stdio: 'inherit' });
+    } else {
+      if (typeScript && prettier) {
+        fs.writeFileSync(
+          `${projectName}/.eslintrc.json`,
+          JSON.stringify(estsPretty, null, 2)
+        );
+      } else if (typeScript) {
+        fs.writeFileSync(
+          `${projectName}/.eslintrc.json`,
+          JSON.stringify(ests, null, 2)
+        );
+      } else if (prettier) {
+        fs.writeFileSync(
+          `${projectName}/.eslintrc.json`,
+          JSON.stringify(esjsPretty, null, 2)
+        );
+      } else {
+        fs.writeFileSync(
+          `${projectName}/.eslintrc.json`,
+          JSON.stringify(esjs, null, 2)
+        );
+      }
     }
 
     linterSpinner.succeed('🔎 Added ESLint');
-    process.chdir(projectName); // Beacuse execSync does not change dir directly
-    spawn('npx', ['eslint', '--init'], { stdio: 'inherit' });
   }
 
   static addPrettier(projectName: string, pkgManager: string): void {

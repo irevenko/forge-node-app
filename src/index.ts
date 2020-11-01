@@ -83,7 +83,7 @@ async function buildProject(): Promise<void> {
       },
       {
         type: 'list',
-        message: '♻️  Do you want to answer ESLint questions?',
+        message: '🔎 Do you want to answer ESLint questions?',
         name: 'eslintQuestions',
         choices: ['Go with defaults', 'Answer questions'],
         when(allAnswers): boolean {
@@ -97,6 +97,7 @@ async function buildProject(): Promise<void> {
     answers.projectName.trim(),
     answers.pkgManager,
     answers.pkgQuestions,
+    answers.eslintQuestions,
     answers.typeScript,
     answers.extraSettings,
     answers.tests
