@@ -8,3 +8,6 @@ export const eslintTsDependencies =
 
 export const lintFormatDependencies =
   'eslint-config-prettier eslint-plugin-prettier';
+
+export const babelDependencies =
+  '@babel/cli @babel/core @babel/node @babel/preset-env';

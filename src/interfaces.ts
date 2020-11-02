@@ -4,6 +4,7 @@ export interface IAnswers {
   pkgQuestions: string;
   eslintQuestions: string;
   typeScript: boolean;
+  babel: boolean;
   extraSettings?: Array<string>;
   tests?: string;
 }

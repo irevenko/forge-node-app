@@ -17,6 +17,7 @@ class ProjectGenerator {
     pkgQuestions: string,
     eslintQuestions: string,
     typeScript: boolean,
+    babel: boolean,
     extraSettings?: Array<string>,
     tests?: string
   ): void {
@@ -27,9 +28,19 @@ class ProjectGenerator {
       ProjectGenerator.initTypeScript(projectName);
     }
 
+    if (babel) {
+      PackageManager.addBabel(projectName, pkgManager);
+    }
+
     ProjectGenerator.createSourceFolder(projectName, typeScript);
     PackageManager.addPackageDetails(projectName);
-    PackageManager.createScripts(projectName, typeScript, extraSettings, tests);
+    PackageManager.createScripts(
+      projectName,
+      typeScript,
+      babel,
+      extraSettings,
+      tests
+    );
 
     if (tests === 'Jest') {
       ProjectGenerator.createTestsFolder(projectName, typeScript);

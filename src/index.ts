@@ -62,7 +62,7 @@ async function buildProject(): Promise<void> {
       },
       {
         type: 'checkbox',
-        message: '⚙️  Pick the config:',
+        message: '⚙️ Pick the config:',
         name: 'extraSettings',
         choices: [
           'ESLint',
@@ -99,6 +99,7 @@ async function buildProject(): Promise<void> {
     answers.pkgQuestions,
     answers.eslintQuestions,
     answers.typeScript,
+    answers.babel,
     answers.extraSettings,
     answers.tests
   );

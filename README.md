@@ -3,7 +3,8 @@
 A Fast Way to Generate Node Boilerplate With Your Favorite Development Tools and Libs
 
 # ToDo
-- Babel, Jest + dotenv, init jest conf for js
+- Babel, Babel + ESLint + nodemon
+- init jest conf for js, Jest + dotenv
 - Add Mocha + Chai
 - Write dotenv to top
 - New tsconf for TS projects

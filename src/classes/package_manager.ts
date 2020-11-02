@@ -5,6 +5,7 @@ import ora from 'ora';
 import { execSync, spawn } from 'child_process';
 import { IPackage } from '../interfaces';
 import {
+  babelDependencies,
   eslintDependencies,
   eslintTsDependencies,
   lintFormatDependencies,
@@ -15,6 +16,7 @@ import {
   dotenvFile,
   dotenvTsFile,
   prettierConfig,
+  babelConfig,
 } from '../config/misc';
 import esjs from '../config/eslint/eslint_js';
 import ests from '../config/eslint/eslint_ts';
@@ -43,6 +45,7 @@ class PackageManager {
   static createScripts(
     projectName: string,
     typeScript: boolean,
+    babel: boolean,
     extraSettings?: Array<string>,
     tests?: string
   ): void {
@@ -54,16 +57,20 @@ class PackageManager {
 
     pkgJSON.scripts = {};
 
-    typeScript
-      ? (pkgJSON.scripts.start = 'ts-node src/index.ts')
-      : (pkgJSON.scripts.start = 'node src/index.js');
+    if (typeScript) {
+      pkgJSON.scripts.start = 'ts-node src/index.ts';
+    } else if (babel) {
+      pkgJSON.scripts.start = 'npx babel-node src/index.js';
+    } else {
+      pkgJSON.scripts.start = 'node src/index.js';
+    }
 
     typeScript ? (pkgJSON.main = 'index.ts') : (pkgJSON.main = 'index.js');
 
     if (typeScript) {
+      pkgJSON.scripts['start:source'] = 'tsc && node out/index.js';
       pkgJSON.scripts.build = 'tsc';
       pkgJSON.scripts.watch = 'tsc src/*.ts --watch';
-      pkgJSON.scripts['start:source'] = 'tsc && node out/index.js';
     }
 
     if (tests === 'Jest') {
@@ -133,6 +140,25 @@ class PackageManager {
     }
 
     tsSpinner.succeed('📥 Set Up TypeScript');
+  }
+
+  static addBabel(projectName: string, pkgManager: string): void {
+    const prettierSpinner = ora('🐠 Adding Babel...').start();
+
+    if (pkgManager === 'npm') {
+      execSync(`cd ${projectName} && npm i ${babelDependencies} -D`, {
+        stdio: 'ignore',
+      });
+    }
+    if (pkgManager === 'yarn') {
+      execSync(`cd ${projectName} && yarn add ${babelDependencies} -D`, {
+        stdio: 'ignore',
+      });
+    }
+
+    fs.writeFileSync(`./${projectName}/.babelrc`, babelConfig);
+
+    prettierSpinner.succeed('🐠 Added Babel');
   }
 
   static addEslint(
