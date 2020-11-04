@@ -20,8 +20,10 @@ import {
 } from '../config/misc';
 import esjs from '../config/eslint/eslint_js';
 import ests from '../config/eslint/eslint_ts';
+import esbabel from '../config/eslint/eslint_babel';
 import esjsPretty from '../config/eslint/eslint_prettier_js';
 import estsPretty from '../config/eslint/eslint_prettier_ts';
+import esbabelPretty from '../config/eslint/eslint_prettier_babel';
 
 class PackageManager {
   static initPackage(
@@ -166,6 +168,7 @@ class PackageManager {
     pkgManager: string,
     eslintQuestions: string,
     typeScript: boolean,
+    babel: boolean,
     prettier: boolean
   ): void {
     const linterSpinner = ora('🔎 Adding ESLint...').start();
@@ -204,6 +207,16 @@ class PackageManager {
         fs.writeFileSync(
           `${projectName}/.eslintrc.json`,
           JSON.stringify(ests, null, 2)
+        );
+      } else if (babel && prettier) {
+        fs.writeFileSync(
+          `${projectName}/.eslintrc.json`,
+          JSON.stringify(esbabelPretty, null, 2)
+        );
+      } else if (babel) {
+        fs.writeFileSync(
+          `${projectName}/.eslintrc.json`,
+          JSON.stringify(esbabel, null, 2)
         );
       } else if (prettier) {
         fs.writeFileSync(
@@ -258,6 +271,25 @@ class PackageManager {
     }
 
     linterPrettierSpinner.succeed('🖇 Connected ESLint with Prettier');
+  }
+
+  static attachLinterWithBabel(projectName: string, pkgManager: string): void {
+    const linterPrettierSpinner = ora(
+      '🖇 Connecting ESLint with Babel...'
+    ).start();
+
+    if (pkgManager === 'npm') {
+      execSync(`cd ${projectName} && npm i babel-eslint -D`, {
+        stdio: 'ignore',
+      });
+    }
+    if (pkgManager === 'yarn') {
+      execSync(`cd ${projectName} && yarn add @babel/eslint-parser -D`, {
+        stdio: 'ignore',
+      });
+    }
+
+    linterPrettierSpinner.succeed('🖇 Connected ESLint with Babel');
   }
 
   static addDotenv(

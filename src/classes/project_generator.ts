@@ -57,11 +57,8 @@ class ProjectGenerator {
       ) {
         PackageManager.attachLinterWithPrettier(projectName, pkgManager);
       }
-      if (extraSettings.includes('dotenv')) {
-        PackageManager.addDotenv(projectName, pkgManager, typeScript);
-      }
-      if (extraSettings.includes('nodemon or ts-node-dev')) {
-        PackageManager.addChangesMonitor(projectName, pkgManager, typeScript);
+      if (extraSettings.includes('ESLint') && babel) {
+        PackageManager.attachLinterWithBabel(projectName, pkgManager);
       }
       if (extraSettings.includes('ESLint')) {
         PackageManager.addEslint(
@@ -69,8 +66,15 @@ class ProjectGenerator {
           pkgManager,
           eslintQuestions,
           typeScript,
+          babel,
           extraSettings.includes('Prettier')
         );
+      }
+      if (extraSettings.includes('dotenv')) {
+        PackageManager.addDotenv(projectName, pkgManager, typeScript);
+      }
+      if (extraSettings.includes('nodemon or ts-node-dev')) {
+        PackageManager.addChangesMonitor(projectName, pkgManager, typeScript);
       }
     }
 
