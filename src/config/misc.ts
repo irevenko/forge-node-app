@@ -1,13 +1,15 @@
 export const defaultJsFile =
-  'const n = 5;\nconsole.log(n);\nmodule.exports = n;';
+  'const n = 5;\nconsole.log(n);\nmodule.exports = n;\n';
 
-export const defaultTsFile = 'export const n: number = 5;\nconsole.log(n);';
+export const defaultBabelFile = 'export const n = 5;\nconsole.log(n);\n';
+
+export const defaultTsFile = 'export const n: number = 5;\nconsole.log(n);\n';
 
 export const dotenvTsFile =
-  "import 'dotenv/config';\nconsole.log(process.env.MSG);";
+  "import 'dotenv/config';\nconsole.log(process.env.MSG);\n";
 
 export const dotenvJsFile =
-  "require('dotenv').config();\nconsole.log(process.env.MSG);";
+  "require('dotenv').config();\nconsole.log(process.env.MSG);\n";
 
 export const dotenvFile = 'MSG=HelloWorld';
 

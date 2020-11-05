@@ -6,6 +6,7 @@ import { execSync, spawn } from 'child_process';
 import { IPackage } from '../interfaces';
 import {
   babelDependencies,
+  babelLinterDependencies,
   eslintDependencies,
   eslintTsDependencies,
   lintFormatDependencies,
@@ -75,6 +76,12 @@ class PackageManager {
       pkgJSON.scripts.watch = 'tsc src/*.ts --watch';
     }
 
+    if (babel) {
+      pkgJSON.scripts['start:source'] = 'npm run build && node out/index.js';
+      pkgJSON.scripts.build = 'babel src -d out --presets @babel/preset-env';
+      pkgJSON.scripts.watch = 'babel src -d out --presets @babel/preset-env -w';
+    }
+
     if (tests === 'Jest') {
       pkgJSON.scripts.test = 'npx jest';
     }
@@ -95,9 +102,13 @@ class PackageManager {
     }
 
     if (extraSettings!.includes('nodemon or ts-node-dev')) {
-      typeScript
-        ? (pkgJSON.scripts.dev = 'ts-node-dev src/')
-        : (pkgJSON.scripts.dev = 'nodemon src/');
+      if (typeScript) {
+        pkgJSON.scripts.dev = 'ts-node-dev src/index';
+      } else if (babel) {
+        pkgJSON.scripts.dev = 'nodemon --exec babel-node src/index';
+      } else {
+        pkgJSON.scripts.dev = 'nodemon src/index';
+      }
     }
 
     fs.writeFileSync(
@@ -279,12 +290,12 @@ class PackageManager {
     ).start();
 
     if (pkgManager === 'npm') {
-      execSync(`cd ${projectName} && npm i babel-eslint -D`, {
+      execSync(`cd ${projectName} && npm i ${babelLinterDependencies} -D`, {
         stdio: 'ignore',
       });
     }
     if (pkgManager === 'yarn') {
-      execSync(`cd ${projectName} && yarn add @babel/eslint-parser -D`, {
+      execSync(`cd ${projectName} && yarn add ${babelLinterDependencies} -D`, {
         stdio: 'ignore',
       });
     }
@@ -295,7 +306,8 @@ class PackageManager {
   static addDotenv(
     projectName: string,
     pkgManager: string,
-    typeScript: boolean
+    typeScript: boolean,
+    babel: boolean
   ): void {
     const dotenvSpinner = ora('🔒 Adding Dotenv...').start();
 
@@ -311,9 +323,14 @@ class PackageManager {
     }
 
     fs.writeFileSync(`./${projectName}/.env`, dotenvFile);
-    typeScript
-      ? fs.writeFileSync(`./${projectName}/src/index.ts`, dotenvTsFile)
-      : fs.writeFileSync(`./${projectName}/src/index.js`, dotenvJsFile);
+
+    if (typeScript) {
+      fs.appendFileSync(`./${projectName}/src/index.ts`, dotenvTsFile);
+    } else if (babel) {
+      fs.appendFileSync(`./${projectName}/src/index.js`, dotenvTsFile);
+    } else {
+      fs.appendFileSync(`./${projectName}/src/index.js`, dotenvJsFile);
+    }
 
     dotenvSpinner.succeed('🔒 Added Dotenv');
   }

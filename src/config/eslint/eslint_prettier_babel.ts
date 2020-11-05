@@ -7,10 +7,11 @@ const esbabelPretty = {
   extends: [
     "eslint:recommended",
     "plugin:node/recommended",
+    "plugin:prettier/recommended",
     "prettier",
-    "plugin:prettier/recommended"
   ],
   parser: "@babel/eslint-parser",
+  plugins: ["babel", "prettier"],
   parserOptions: {
     ecmaVersion: 12,
     sourceType: "module",
@@ -20,7 +21,7 @@ const esbabelPretty = {
     },
   },
   rules: {
-    "eslint-disable-next-line node/no-unsupported-features/es-syntax": "0",
+    "node/no-unsupported-features/es-syntax": 0,
   },
 };
 

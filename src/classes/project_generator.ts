@@ -4,6 +4,7 @@ import chalk from 'chalk';
 import { execSync } from 'child_process';
 import PackageManager from './package_manager';
 import {
+  defaultBabelFile,
   defaultJsFile,
   defaultTsFile,
   jestJsFile,
@@ -32,7 +33,7 @@ class ProjectGenerator {
       PackageManager.addBabel(projectName, pkgManager);
     }
 
-    ProjectGenerator.createSourceFolder(projectName, typeScript);
+    ProjectGenerator.createSourceFolder(projectName, typeScript, babel);
     PackageManager.addPackageDetails(projectName);
     PackageManager.createScripts(
       projectName,
@@ -71,7 +72,7 @@ class ProjectGenerator {
         );
       }
       if (extraSettings.includes('dotenv')) {
-        PackageManager.addDotenv(projectName, pkgManager, typeScript);
+        PackageManager.addDotenv(projectName, pkgManager, typeScript, babel);
       }
       if (extraSettings.includes('nodemon or ts-node-dev')) {
         PackageManager.addChangesMonitor(projectName, pkgManager, typeScript);
@@ -88,13 +89,22 @@ class ProjectGenerator {
     execSync(`cd ${projectName} && npx tsc --init`, { stdio: 'ignore' });
   }
 
-  static createSourceFolder(projectName: string, typeScript: boolean): void {
+  static createSourceFolder(
+    projectName: string,
+    typeScript: boolean,
+    babel: boolean
+  ): void {
     const srcSpinner = ora('📂 Creating Source Folder...').start();
 
     fs.mkdirSync(`${projectName}/src`, { recursive: true });
+
     typeScript
       ? fs.writeFileSync(`./${projectName}/src/index.ts`, defaultTsFile)
       : fs.writeFileSync(`./${projectName}/src/index.js`, defaultJsFile);
+
+    if (babel) {
+      fs.writeFileSync(`./${projectName}/src/index.js`, defaultBabelFile);
+    }
 
     srcSpinner.succeed('📂 Created Source Folder');
   }

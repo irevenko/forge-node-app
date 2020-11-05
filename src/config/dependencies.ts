@@ -11,3 +11,6 @@ export const lintFormatDependencies =
 
 export const babelDependencies =
   '@babel/cli @babel/core @babel/node @babel/preset-env';
+
+export const babelLinterDependencies =
+  '@babel/eslint-parser @babel/eslint-plugin';
