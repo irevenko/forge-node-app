@@ -13,6 +13,8 @@ import {
   tsDependencies,
 } from '../config/dependencies';
 import {
+  eslintIgnore,
+  prettierIgnore,
   dotenvJsFile,
   dotenvFile,
   dotenvTsFile,
@@ -71,7 +73,7 @@ class PackageManager {
     typeScript ? (pkgJSON.main = 'index.ts') : (pkgJSON.main = 'index.js');
 
     if (typeScript) {
-      pkgJSON.scripts['start:source'] = 'tsc && node out/index.js';
+      pkgJSON.scripts['start:source'] = 'tsc && node out/index.ts';
       pkgJSON.scripts.build = 'tsc';
       pkgJSON.scripts.watch = 'tsc src/*.ts --watch';
     }
@@ -184,6 +186,8 @@ class PackageManager {
   ): void {
     const linterSpinner = ora('🔎 Adding ESLint...').start();
 
+    fs.writeFileSync(`${projectName}/.eslintignore`, eslintIgnore);
+
     if (pkgManager === 'npm') {
       execSync(`cd ${projectName} && npm i ${eslintDependencies} -D`, {
         stdio: 'ignore',
@@ -248,6 +252,9 @@ class PackageManager {
   static addPrettier(projectName: string, pkgManager: string): void {
     const prettierSpinner = ora('🧹 Adding Prettier...').start();
 
+    fs.writeFileSync(`${projectName}/.prettierignore`, prettierIgnore);
+    fs.writeFileSync(`./${projectName}/.prettierrc`, prettierConfig);
+
     if (pkgManager === 'npm') {
       execSync(`cd ${projectName} && npm i prettier -D`, { stdio: 'ignore' });
     }
@@ -256,8 +263,6 @@ class PackageManager {
         stdio: 'ignore',
       });
     }
-
-    fs.writeFileSync(`./${projectName}/.prettierrc`, prettierConfig);
 
     prettierSpinner.succeed('🧹 Added Prettier');
   }

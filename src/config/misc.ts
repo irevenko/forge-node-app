@@ -15,6 +15,12 @@ export const dotenvFile = 'MSG=HelloWorld';
 
 export const prettierConfig = '{\n\t"singleQuote": true\n}';
 
+export const prettierIgnore =
+  '/node_modules/\n/out/\n/dist/\n/build/**\n/coverage/**\n/templates/**\n/tests/**\n.eslintrc.js\n';
+
+export const eslintIgnore =
+  '/node_modules/\n/out/\n/dist/\n/build/**\n/coverage/**\n/templates/**\n/tests/**\n';
+
 export const babelConfig = '{\n\t "presets": ["@babel/preset-env"]\n}';
 
 export const jestJsFile =
