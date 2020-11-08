@@ -7,8 +7,9 @@ import {
   defaultBabelFile,
   defaultJsFile,
   defaultTsFile,
-  jestJsFile,
-  jestTsFile,
+  jestCommonFile,
+  jestESFile,
+  jestConfig,
 } from '../config/misc';
 
 class ProjectGenerator {
@@ -44,8 +45,8 @@ class ProjectGenerator {
     );
 
     if (tests === 'Jest') {
-      ProjectGenerator.createTestsFolder(projectName, typeScript);
-      PackageManager.addJest(projectName, pkgManager, typeScript);
+      ProjectGenerator.createTestsFolder(projectName, typeScript, babel);
+      PackageManager.addJest(projectName, pkgManager, typeScript, babel);
     }
 
     if (extraSettings) {
@@ -109,16 +110,27 @@ class ProjectGenerator {
     srcSpinner.succeed('📂 Created Source Folder');
   }
 
-  static createTestsFolder(projectName: string, typeScript: boolean): void {
+  static createTestsFolder(
+    projectName: string,
+    typeScript: boolean,
+    babel: boolean
+  ): void {
     const srcSpinner = ora('📂 Creating Tests Folder...').start();
 
     fs.mkdirSync(`${projectName}/__tests__`, { recursive: true });
-    typeScript
-      ? fs.writeFileSync(`./${projectName}/__tests__/index.test.ts`, jestTsFile)
-      : fs.writeFileSync(
-          `./${projectName}/__tests__/index.test.js`,
-          jestJsFile
-        );
+    if (typeScript) {
+      fs.writeFileSync(`./${projectName}/__tests__/index.test.ts`, jestESFile);
+    } else if (babel) {
+      fs.writeFileSync(`./${projectName}/__tests__/index.test.js`, jestESFile);
+      fs.writeFileSync(`./${projectName}/jest.config.js`, jestConfig);
+    } else {
+      fs.writeFileSync(
+        `./${projectName}/__tests__/index.test.js`,
+        jestCommonFile
+      );
+      fs.writeFileSync(`./${projectName}/jest.config.js`, jestConfig);
+    }
+
     srcSpinner.succeed('📂 Created Tests Folder');
   }
 }

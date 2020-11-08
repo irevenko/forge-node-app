@@ -15,9 +15,9 @@ import {
 import {
   eslintIgnore,
   prettierIgnore,
-  dotenvJsFile,
+  dotenvCommonFile,
   dotenvFile,
-  dotenvTsFile,
+  dotenvESFile,
   prettierConfig,
   babelConfig,
 } from '../config/misc';
@@ -105,7 +105,7 @@ class PackageManager {
 
     if (extraSettings!.includes('nodemon or ts-node-dev')) {
       if (typeScript) {
-        pkgJSON.scripts.dev = 'ts-node-dev src/index';
+        pkgJSON.scripts.dev = 'ts-node-dev --respawn src/index';
       } else if (babel) {
         pkgJSON.scripts.dev = 'nodemon --exec babel-node src/index';
       } else {
@@ -330,11 +330,11 @@ class PackageManager {
     fs.writeFileSync(`./${projectName}/.env`, dotenvFile);
 
     if (typeScript) {
-      fs.appendFileSync(`./${projectName}/src/index.ts`, dotenvTsFile);
+      fs.appendFileSync(`./${projectName}/src/index.ts`, dotenvESFile);
     } else if (babel) {
-      fs.appendFileSync(`./${projectName}/src/index.js`, dotenvTsFile);
+      fs.appendFileSync(`./${projectName}/src/index.js`, dotenvESFile);
     } else {
-      fs.appendFileSync(`./${projectName}/src/index.js`, dotenvJsFile);
+      fs.appendFileSync(`./${projectName}/src/index.js`, dotenvCommonFile);
     }
 
     dotenvSpinner.succeed('🔒 Added Dotenv');
@@ -371,7 +371,8 @@ class PackageManager {
   static addJest(
     projectName: string,
     pkgManager: string,
-    typeScript: boolean
+    typeScript: boolean,
+    babel: boolean
   ): void {
     const nodemonSpinner = ora('🃏 Adding Jest...').start();
 
@@ -383,6 +384,11 @@ class PackageManager {
         : execSync(`cd ${projectName} && npm i jest -D`, {
             stdio: 'ignore',
           });
+      if (babel) {
+        execSync(`cd ${projectName} && npm i jest-babel -D`, {
+          stdio: 'ignore',
+        });
+      }
     }
     if (pkgManager === 'yarn') {
       typeScript
@@ -393,10 +399,19 @@ class PackageManager {
         : execSync(`cd ${projectName} && yarn add jest -D`, {
             stdio: 'ignore',
           });
+      if (babel) {
+        execSync(`cd ${projectName} && npm i jest-babel -D`, {
+          stdio: 'ignore',
+        });
+      }
     }
 
     if (typeScript) {
       execSync(`cd ${projectName} && npx ts-jest config:init`);
+      fs.renameSync(
+        `${projectName}/jest.config.js`,
+        `${projectName}/jest.config.ts`
+      );
     }
 
     nodemonSpinner.succeed('🃏 Added Jest');
