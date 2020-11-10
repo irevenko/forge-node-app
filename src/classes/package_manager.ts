@@ -88,6 +88,18 @@ class PackageManager {
       pkgJSON.scripts.test = 'npx jest';
     }
 
+    if (tests === 'Mocha + Chai') {
+      if (typeScript) {
+        pkgJSON.scripts.test =
+          'npx mocha __tests__/**/*.ts -r ts-node/register';
+      } else if (babel) {
+        pkgJSON.scripts.test =
+          'npx mocha __tests__/**/*.js --require @babel/register --require @babel/polyfill';
+      } else {
+        pkgJSON.scripts.test = 'npx mocha __tests__/**/*.js';
+      }
+    }
+
     if (extraSettings!.includes('ESLint')) {
       typeScript
         ? (pkgJSON.scripts.lint = 'eslint src/*.ts')
@@ -400,14 +412,16 @@ class PackageManager {
             stdio: 'ignore',
           });
       if (babel) {
-        execSync(`cd ${projectName} && npm i jest-babel -D`, {
+        execSync(`cd ${projectName} && yarn add jest-babel -D`, {
           stdio: 'ignore',
         });
       }
     }
 
     if (typeScript) {
-      execSync(`cd ${projectName} && npx ts-jest config:init`);
+      execSync(`cd ${projectName} && npx ts-jest config:init`, {
+        stdio: 'ignore',
+      });
       fs.renameSync(
         `${projectName}/jest.config.js`,
         `${projectName}/jest.config.ts`
@@ -415,6 +429,58 @@ class PackageManager {
     }
 
     nodemonSpinner.succeed('🃏 Added Jest');
+  }
+
+  static addMochaChai(
+    projectName: string,
+    pkgManager: string,
+    typeScript: boolean,
+    babel: boolean
+  ): void {
+    const nodemonSpinner = ora('🍵 Adding Mocha & Chai...').start();
+
+    if (pkgManager === 'npm') {
+      typeScript
+        ? execSync(
+            `cd ${projectName} && npm i mocha chai @types/mocha @types/chai -D`,
+            {
+              stdio: 'ignore',
+            }
+          )
+        : execSync(`cd ${projectName} && npm i mocha chai -D`, {
+            stdio: 'ignore',
+          });
+      if (babel) {
+        execSync(
+          `cd ${projectName} && npm i @babel/register @babel/polyfill -D`,
+          {
+            stdio: 'ignore',
+          }
+        );
+      }
+    }
+    if (pkgManager === 'yarn') {
+      typeScript
+        ? execSync(
+            `cd ${projectName} && yarn add mocha chai @types/mocha @types/chai -D`,
+            {
+              stdio: 'ignore',
+            }
+          )
+        : execSync(`cd ${projectName} && yarn add mocha chai -D`, {
+            stdio: 'ignore',
+          });
+      if (babel) {
+        execSync(
+          `cd ${projectName} && yarn add @babel/register @babel/polyfill -D`,
+          {
+            stdio: 'ignore',
+          }
+        );
+      }
+    }
+
+    nodemonSpinner.succeed('🍵 Added Mocha & Chai');
   }
 }
 

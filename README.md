@@ -3,14 +3,15 @@
 A Fast Way to Generate Node Boilerplate With Your Favorite Development Tools and Libs
 
 # ToDo
-- Would you like to answer JEST quesitons
+- Re:Check Vue CLI and create-node-app(yargs) (good practices)
+- Add Presets
+- ESlint + AirBNB Google Standart
+- Add hints in the end (for git, JEST)
 - Extend JEST, Babel configs
-- Add Mocha + Chai, ?Jasmine + any
+- Add Jasmine + any testing
 - New tsconf for TS projects
 - Init git
-- Ask: do you want to install typescript and ts-node globally? 
-- Fix npx thing
-- Add gitignore, LICENSE, README
+- Add gitignore, LICENSE, README | npx covgen gitignore license
 - Add Webpack (rollup, parcel, gulp, snowpack)
 - Add yargs (all questions but with args)
 - Fix ora with async

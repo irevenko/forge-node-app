@@ -29,4 +29,10 @@ export const jestCommonFile =
 export const jestESFile =
   "import { n } from '../src/index';\ntest('n is equal 5', () => {\n  expect(n).toBe(5);\n});";
 
+export const mochaChaiCommonFile =
+  "const n = require('../src/index');\nconst expect = require('chai').expect;\n\ndescribe('Number', () => {\n  it('should be 5', () => {\n    expect(n).to.be.equal(5);\n  });\n});";
+
+export const mochaChaiESFile =
+  "import { n } from'../src/index';\nimport { expect } from 'chai';\n\ndescribe('Number', () => {\n  it('should be 5', () => {\n    expect(n).to.be.equal(5);\n  });\n});";
+
 export const jestConfig = "module.exports = {\n\ttestEnvironment: 'node'\n};";

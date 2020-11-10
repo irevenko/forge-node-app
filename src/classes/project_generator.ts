@@ -4,6 +4,8 @@ import chalk from 'chalk';
 import { execSync } from 'child_process';
 import PackageManager from './package_manager';
 import {
+  mochaChaiCommonFile,
+  mochaChaiESFile,
   defaultBabelFile,
   defaultJsFile,
   defaultTsFile,
@@ -45,8 +47,13 @@ class ProjectGenerator {
     );
 
     if (tests === 'Jest') {
-      ProjectGenerator.createTestsFolder(projectName, typeScript, babel);
+      ProjectGenerator.createTestsFolder(projectName, typeScript, babel, tests);
       PackageManager.addJest(projectName, pkgManager, typeScript, babel);
+    }
+
+    if (tests === 'Mocha + Chai') {
+      ProjectGenerator.createTestsFolder(projectName, typeScript, babel, tests);
+      PackageManager.addMochaChai(projectName, pkgManager, typeScript, babel);
     }
 
     if (extraSettings) {
@@ -113,22 +120,52 @@ class ProjectGenerator {
   static createTestsFolder(
     projectName: string,
     typeScript: boolean,
-    babel: boolean
+    babel: boolean,
+    testingFramework: string
   ): void {
     const srcSpinner = ora('📂 Creating Tests Folder...').start();
 
     fs.mkdirSync(`${projectName}/__tests__`, { recursive: true });
-    if (typeScript) {
-      fs.writeFileSync(`./${projectName}/__tests__/index.test.ts`, jestESFile);
-    } else if (babel) {
-      fs.writeFileSync(`./${projectName}/__tests__/index.test.js`, jestESFile);
-      fs.writeFileSync(`./${projectName}/jest.config.js`, jestConfig);
-    } else {
-      fs.writeFileSync(
-        `./${projectName}/__tests__/index.test.js`,
-        jestCommonFile
-      );
-      fs.writeFileSync(`./${projectName}/jest.config.js`, jestConfig);
+
+    // eslint-disable-next-line default-case
+    switch (testingFramework) {
+      case 'Jest':
+        if (typeScript) {
+          fs.writeFileSync(
+            `./${projectName}/__tests__/index.test.ts`,
+            jestESFile
+          );
+        } else if (babel) {
+          fs.writeFileSync(
+            `./${projectName}/__tests__/index.test.js`,
+            jestESFile
+          );
+          fs.writeFileSync(`./${projectName}/jest.config.js`, jestConfig);
+        } else {
+          fs.writeFileSync(
+            `./${projectName}/__tests__/index.test.js`,
+            jestCommonFile
+          );
+          fs.writeFileSync(`./${projectName}/jest.config.js`, jestConfig);
+        }
+        break;
+      case 'Mocha + Chai':
+        if (typeScript) {
+          fs.writeFileSync(
+            `./${projectName}/__tests__/index.spec.ts`,
+            mochaChaiESFile
+          );
+        } else if (babel) {
+          fs.writeFileSync(
+            `./${projectName}/__tests__/index.spec.js`,
+            mochaChaiESFile
+          );
+        } else {
+          fs.writeFileSync(
+            `./${projectName}/__tests__/index.spec.js`,
+            mochaChaiCommonFile
+          );
+        }
     }
 
     srcSpinner.succeed('📂 Created Tests Folder');
