@@ -23,6 +23,7 @@ class ProjectGenerator {
     typeScript: boolean,
     babel: boolean,
     extraSettings?: Array<string>,
+    extraOptions?: Array<string>,
     tests?: string
   ): void {
     PackageManager.initPackage(projectName, pkgManager, pkgQuestions);
@@ -34,6 +35,18 @@ class ProjectGenerator {
 
     if (babel) {
       PackageManager.addBabel(projectName, pkgManager);
+    }
+
+    if (extraOptions) {
+      if (extraOptions.includes('git')) {
+        ProjectGenerator.initGit(projectName);
+      }
+      if (extraOptions.includes('README')) {
+        ProjectGenerator.addReadme(projectName);
+      }
+      if (extraOptions.includes('License')) {
+        ProjectGenerator.addLicense(projectName);
+      }
     }
 
     ProjectGenerator.createSourceFolder(projectName, typeScript, babel);
@@ -107,11 +120,11 @@ class ProjectGenerator {
     fs.mkdirSync(`${projectName}/src`, { recursive: true });
 
     typeScript
-      ? fs.writeFileSync(`./${projectName}/src/index.ts`, defaultTsFile)
-      : fs.writeFileSync(`./${projectName}/src/index.js`, defaultJsFile);
+      ? fs.writeFileSync(`${projectName}/src/index.ts`, defaultTsFile)
+      : fs.writeFileSync(`${projectName}/src/index.js`, defaultJsFile);
 
     if (babel) {
-      fs.writeFileSync(`./${projectName}/src/index.js`, defaultBabelFile);
+      fs.writeFileSync(`${projectName}/src/index.js`, defaultBabelFile);
     }
 
     srcSpinner.succeed('📂 Created Source Folder');
@@ -132,43 +145,67 @@ class ProjectGenerator {
       case 'Jest':
         if (typeScript) {
           fs.writeFileSync(
-            `./${projectName}/__tests__/index.test.ts`,
+            `${projectName}/__tests__/index.test.ts`,
             jestESFile
           );
         } else if (babel) {
           fs.writeFileSync(
-            `./${projectName}/__tests__/index.test.js`,
+            `${projectName}/__tests__/index.test.js`,
             jestESFile
           );
           fs.writeFileSync(`./${projectName}/jest.config.js`, jestConfig);
         } else {
           fs.writeFileSync(
-            `./${projectName}/__tests__/index.test.js`,
+            `${projectName}/__tests__/index.test.js`,
             jestCommonFile
           );
-          fs.writeFileSync(`./${projectName}/jest.config.js`, jestConfig);
+          fs.writeFileSync(`${projectName}/jest.config.js`, jestConfig);
         }
         break;
       case 'Mocha + Chai':
         if (typeScript) {
           fs.writeFileSync(
-            `./${projectName}/__tests__/index.spec.ts`,
+            `${projectName}/__tests__/index.spec.ts`,
             mochaChaiESFile
           );
         } else if (babel) {
           fs.writeFileSync(
-            `./${projectName}/__tests__/index.spec.js`,
+            `${projectName}/__tests__/index.spec.js`,
             mochaChaiESFile
           );
         } else {
           fs.writeFileSync(
-            `./${projectName}/__tests__/index.spec.js`,
+            `${projectName}/__tests__/index.spec.js`,
             mochaChaiCommonFile
           );
         }
     }
 
     srcSpinner.succeed('📂 Created Tests Folder');
+  }
+
+  static initGit(projectName: string): void {
+    const srcSpinner = ora('📚 Initializing git...').start();
+
+    execSync(`cd ${projectName} && git init`, { stdio: 'ignore' });
+
+    srcSpinner.succeed('📚 Initialized git');
+  }
+
+  static addReadme(projectName: string): void {
+    const srcSpinner = ora('📄 Adding README...').start();
+
+    fs.writeFileSync(`${projectName}/README.md`, '');
+
+    srcSpinner.succeed('📄 Added README');
+  }
+
+  static addLicense(projectName: string): void {
+    const srcSpinner = ora('📜 Adding License...').start();
+
+    // run npx license
+
+    srcSpinner.succeed('📜 Added License');
   }
 }
 

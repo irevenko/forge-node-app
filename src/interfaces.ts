@@ -6,6 +6,7 @@ export interface IAnswers {
   typeScript: boolean;
   babel: boolean;
   extraSettings?: Array<string>;
+  extraOptions: Array<string>;
   tests?: string;
 }
 
@@ -14,7 +15,9 @@ export interface IPackage {
   author?: string;
   keywords?: Array<string>;
   license?: string;
-  // repository: {type, url} bugs {url}
+  // homepage
+  // repository: {type, url}
+  // bugs {url}
   main: string;
   scripts: {
     'start:source'?: string;

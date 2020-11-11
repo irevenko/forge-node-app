@@ -90,6 +90,12 @@ async function buildProject(): Promise<void> {
           return allAnswers.extraSettings.includes('ESLint');
         },
       },
+      {
+        type: 'checkbox',
+        message: '🎀 Pick the additional options:',
+        name: 'extraOptions',
+        choices: ['git', 'LICENSE', 'README'],
+      },
     ])
     .catch((error) => console.error(error));
 
@@ -101,6 +107,7 @@ async function buildProject(): Promise<void> {
     answers.typeScript,
     answers.babel,
     answers.extraSettings,
+    answers.extraOptions,
     answers.tests
   );
 }

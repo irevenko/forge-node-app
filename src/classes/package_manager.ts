@@ -183,7 +183,7 @@ class PackageManager {
       });
     }
 
-    fs.writeFileSync(`./${projectName}/.babelrc`, babelConfig);
+    fs.writeFileSync(`${projectName}/.babelrc`, babelConfig);
 
     prettierSpinner.succeed('🐠 Added Babel');
   }
@@ -265,7 +265,7 @@ class PackageManager {
     const prettierSpinner = ora('🧹 Adding Prettier...').start();
 
     fs.writeFileSync(`${projectName}/.prettierignore`, prettierIgnore);
-    fs.writeFileSync(`./${projectName}/.prettierrc`, prettierConfig);
+    fs.writeFileSync(`${projectName}/.prettierrc`, prettierConfig);
 
     if (pkgManager === 'npm') {
       execSync(`cd ${projectName} && npm i prettier -D`, { stdio: 'ignore' });
@@ -339,14 +339,14 @@ class PackageManager {
       });
     }
 
-    fs.writeFileSync(`./${projectName}/.env`, dotenvFile);
+    fs.writeFileSync(`${projectName}/.env`, dotenvFile);
 
     if (typeScript) {
-      fs.appendFileSync(`./${projectName}/src/index.ts`, dotenvESFile);
+      fs.appendFileSync(`${projectName}/src/index.ts`, dotenvESFile);
     } else if (babel) {
-      fs.appendFileSync(`./${projectName}/src/index.js`, dotenvESFile);
+      fs.appendFileSync(`${projectName}/src/index.js`, dotenvESFile);
     } else {
-      fs.appendFileSync(`./${projectName}/src/index.js`, dotenvCommonFile);
+      fs.appendFileSync(`${projectName}/src/index.js`, dotenvCommonFile);
     }
 
     dotenvSpinner.succeed('🔒 Added Dotenv');
