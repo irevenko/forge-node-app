@@ -7,13 +7,14 @@ Contributions, issues and feature requests are welcome! <br>
 Feel free to check issues page
 
 # ToDo
+- Specify exact license name
 - Add Presets
 - Add logger
 - New tsconf for TS projects
 - ESlint + AirBNB Google Standart
 - Add yargs (all questions but with args)
 - Re:Check Vue CLI and create-node-app(yargs) (good practices)
-- Add hints in the end (for git, JEST) Extend JEST, Babel configs
-- !Add gitignore, LICENSE, README | npx gitignore license
+- Extend JEST, Babel configs
 - Fix ora with async (another spinners)
 - Add logo
+- Final code review and fixes (indentation, and other things)

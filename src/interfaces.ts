@@ -8,6 +8,11 @@ export interface IAnswers {
   extraSettings?: Array<string>;
   extraOptions: Array<string>;
   tests?: string;
+  licenseType?: string;
+  licenseAuthor?: string;
+  hostingPlatform?: string;
+  platformUsername?: string;
+  repositoryName?: string;
 }
 
 export interface IPackage {

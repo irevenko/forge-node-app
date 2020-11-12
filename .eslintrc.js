@@ -26,5 +26,6 @@ module.exports = {
     'import/no-unresolved': 0,
     'import/extensions': 0,
     'prefer-default-export': 0,
+    '@typescript-eslint/no-non-null-assertion': 0,
   },
 };

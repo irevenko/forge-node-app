@@ -63,7 +63,7 @@ class PackageManager {
     pkgJSON.scripts = {};
 
     if (typeScript) {
-      pkgJSON.scripts.start = 'ts-node src/index.ts';
+      pkgJSON.scripts.start = 'npx ts-node src/index.ts';
     } else if (babel) {
       pkgJSON.scripts.start = 'npx babel-node src/index.js';
     } else {
@@ -73,15 +73,17 @@ class PackageManager {
     typeScript ? (pkgJSON.main = 'index.ts') : (pkgJSON.main = 'index.js');
 
     if (typeScript) {
-      pkgJSON.scripts['start:source'] = 'tsc && node out/index.ts';
-      pkgJSON.scripts.build = 'tsc';
-      pkgJSON.scripts.watch = 'tsc src/*.ts --watch';
+      pkgJSON.scripts['start:source'] = 'npx tsc && node out/index.ts';
+      pkgJSON.scripts.build = 'npx tsc';
+      pkgJSON.scripts.watch = 'npx tsc src/index.ts --watch';
     }
 
     if (babel) {
       pkgJSON.scripts['start:source'] = 'npm run build && node out/index.js';
-      pkgJSON.scripts.build = 'babel src -d out --presets @babel/preset-env';
-      pkgJSON.scripts.watch = 'babel src -d out --presets @babel/preset-env -w';
+      pkgJSON.scripts.build =
+        'npx babel src -d out --presets @babel/preset-env';
+      pkgJSON.scripts.watch =
+        'npx babel src -d out --presets @babel/preset-env -w';
     }
 
     if (tests === 'Jest') {
@@ -102,26 +104,26 @@ class PackageManager {
 
     if (extraSettings!.includes('ESLint')) {
       typeScript
-        ? (pkgJSON.scripts.lint = 'eslint src/*.ts')
-        : (pkgJSON.scripts.lint = 'eslint src/*.js');
+        ? (pkgJSON.scripts.lint = 'npx eslint src/*.ts')
+        : (pkgJSON.scripts.lint = 'npx eslint src/*.js');
       typeScript
-        ? (pkgJSON.scripts['lint:fix'] = 'eslint src/*.ts --fix')
-        : (pkgJSON.scripts['lint:fix'] = 'eslint src/*.js --fix');
+        ? (pkgJSON.scripts['lint:fix'] = 'npx eslint src/*.ts --fix')
+        : (pkgJSON.scripts['lint:fix'] = 'npx eslint src/*.js --fix');
     }
 
     if (extraSettings!.includes('Prettier')) {
       typeScript
-        ? (pkgJSON.scripts.format = "prettier 'src/*.ts' --write")
-        : (pkgJSON.scripts.format = "prettier 'src/*.js' --write");
+        ? (pkgJSON.scripts.format = 'npx prettier src/*.ts --write')
+        : (pkgJSON.scripts.format = 'npx prettier src/*.js --write');
     }
 
     if (extraSettings!.includes('nodemon or ts-node-dev')) {
       if (typeScript) {
-        pkgJSON.scripts.dev = 'ts-node-dev --respawn src/index';
+        pkgJSON.scripts.dev = 'npx ts-node-dev --respawn src/index';
       } else if (babel) {
-        pkgJSON.scripts.dev = 'nodemon --exec babel-node src/index';
+        pkgJSON.scripts.dev = 'npx nodemon --exec babel-node src/index';
       } else {
-        pkgJSON.scripts.dev = 'nodemon src/index';
+        pkgJSON.scripts.dev = 'npx nodemon src/index';
       }
     }
 
@@ -133,7 +135,11 @@ class PackageManager {
     scriptsSpinner.succeed('📜 Created Scripts');
   }
 
-  static addPackageDetails(projectName: string): void {
+  static addPackageDetails(
+    projectName: string,
+    licenseType?: string,
+    licenseAuthor?: string
+  ): void {
     const scriptsSpinner = ora('📋 Adding Package Details...').start();
 
     const pkgJSON: IPackage = JSON.parse(
@@ -141,7 +147,8 @@ class PackageManager {
     );
 
     pkgJSON.description = 'YOUR DESCRIPTION';
-    pkgJSON.author = 'YOUR NAME <YOUR EMAIL>';
+    pkgJSON.license = licenseType || 'YOUR LICENSE';
+    pkgJSON.author = licenseAuthor || 'YOUR NAME <YOUR EMAIL>';
     pkgJSON.keywords = ['key', 'words'];
 
     fs.writeFileSync(
@@ -210,6 +217,7 @@ class PackageManager {
         });
       }
     }
+
     if (pkgManager === 'yarn') {
       execSync(`cd ${projectName} && yarn add ${eslintDependencies} -D`, {
         stdio: 'ignore',
@@ -368,6 +376,7 @@ class PackageManager {
             stdio: 'ignore',
           });
     }
+
     if (pkgManager === 'yarn') {
       typeScript
         ? execSync(`cd ${projectName} && yarn add ts-node-dev -D`, {
@@ -377,6 +386,7 @@ class PackageManager {
             stdio: 'ignore',
           });
     }
+
     nodemonSpinner.succeed('🔁 Added Changes Monitor');
   }
 
@@ -402,6 +412,7 @@ class PackageManager {
         });
       }
     }
+
     if (pkgManager === 'yarn') {
       typeScript
         ? execSync(
@@ -459,6 +470,7 @@ class PackageManager {
         );
       }
     }
+
     if (pkgManager === 'yarn') {
       typeScript
         ? execSync(

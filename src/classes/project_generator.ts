@@ -1,6 +1,7 @@
 import fs from 'fs';
 import ora from 'ora';
 import chalk from 'chalk';
+import { getLicense } from 'license';
 import { execSync } from 'child_process';
 import PackageManager from './package_manager';
 import {
@@ -24,7 +25,12 @@ class ProjectGenerator {
     babel: boolean,
     extraSettings?: Array<string>,
     extraOptions?: Array<string>,
-    tests?: string
+    tests?: string,
+    licenseType?: string,
+    licenseAuthor?: string,
+    hostingPlatform?: string,
+    platformUsername?: string,
+    repositoryName?: string
   ): void {
     PackageManager.initPackage(projectName, pkgManager, pkgQuestions);
 
@@ -39,18 +45,23 @@ class ProjectGenerator {
 
     if (extraOptions) {
       if (extraOptions.includes('git')) {
-        ProjectGenerator.initGit(projectName);
+        ProjectGenerator.initGit(
+          projectName,
+          hostingPlatform!,
+          platformUsername!,
+          repositoryName!
+        );
       }
       if (extraOptions.includes('README')) {
         ProjectGenerator.addReadme(projectName);
       }
-      if (extraOptions.includes('License')) {
-        ProjectGenerator.addLicense(projectName);
+      if (extraOptions.includes('LICENSE')) {
+        ProjectGenerator.addLicense(projectName, licenseType!, licenseAuthor!);
       }
     }
 
     ProjectGenerator.createSourceFolder(projectName, typeScript, babel);
-    PackageManager.addPackageDetails(projectName);
+    PackageManager.addPackageDetails(projectName, licenseType!, licenseAuthor!);
     PackageManager.createScripts(
       projectName,
       typeScript,
@@ -104,6 +115,13 @@ class ProjectGenerator {
     console.log(
       chalk.greenBright(`🚀 cd ${projectName} && ${pkgManager} start`)
     );
+    if (extraOptions?.includes('git')) {
+      console.log(
+        chalk.redBright('Do not forget to push your files to the repo')
+      );
+      console.log('git add . && git commit -m "Initial commit"');
+      console.log('git push origin master');
+    }
   }
 
   static initTypeScript(projectName: string): void {
@@ -184,28 +202,78 @@ class ProjectGenerator {
     srcSpinner.succeed('📂 Created Tests Folder');
   }
 
-  static initGit(projectName: string): void {
+  static initGit(
+    projectName: string,
+    hostingPlatform: string,
+    platformUsername: string,
+    repositoryName: string
+  ): void {
     const srcSpinner = ora('📚 Initializing git...').start();
 
     execSync(`cd ${projectName} && git init`, { stdio: 'ignore' });
+
+    // eslint-disable-next-line default-case
+    switch (hostingPlatform) {
+      case 'GitHub':
+        execSync(
+          `cd ${projectName} && git remote add origin https://github.com/${platformUsername}/${repositoryName}.git`,
+          { stdio: 'ignore' }
+        );
+        break;
+      case 'GitLab':
+        execSync(
+          `cd ${projectName} && git remote add origin https://gitlab.com/${platformUsername}/${repositoryName}.git`,
+          { stdio: 'ignore' }
+        );
+        break;
+    }
+
+    execSync(`cd ${projectName} && npx gitignore node`, { stdio: 'ignore' });
 
     srcSpinner.succeed('📚 Initialized git');
   }
 
   static addReadme(projectName: string): void {
-    const srcSpinner = ora('📄 Adding README...').start();
+    const srcSpinner = ora('📄 Creating README...').start();
 
-    fs.writeFileSync(`${projectName}/README.md`, '');
+    fs.writeFileSync(`${projectName}/README.md`, `# ${projectName}`);
 
-    srcSpinner.succeed('📄 Added README');
+    srcSpinner.succeed('📄 Created README');
   }
 
-  static addLicense(projectName: string): void {
-    const srcSpinner = ora('📜 Adding License...').start();
+  static addLicense(
+    projectName: string,
+    licenseType: string,
+    licenseAuthor: string
+  ): void {
+    const srcSpinner = ora('📜 Creating License...').start();
 
-    // run npx license
+    // eslint-disable-next-line default-case
+    switch (licenseType) {
+      case 'MIT':
+        fs.writeFileSync(
+          `${projectName}/LICENSE`,
+          getLicense('MIT', {
+            author: licenseAuthor || '<your name>',
+            year: `${new Date().getFullYear()}`,
+          })
+        );
+        break;
+      case 'Apache':
+        fs.writeFileSync(`${projectName}/LICENSE`, getLicense('Apache-2.0'));
+        break;
+      case 'GPL':
+        fs.writeFileSync(`${projectName}/LICENSE`, getLicense('GPL-3.0'));
+        break;
+      case 'ISC':
+        fs.writeFileSync(`${projectName}/LICENSE`, getLicense('ISC'));
+        break;
+      case 'BSD':
+        fs.writeFileSync(`${projectName}/LICENSE`, getLicense('BSD-3-Clause'));
+        break;
+    }
 
-    srcSpinner.succeed('📜 Added License');
+    srcSpinner.succeed('📜 Created License');
   }
 }
 

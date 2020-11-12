@@ -96,6 +96,48 @@ async function buildProject(): Promise<void> {
         name: 'extraOptions',
         choices: ['git', 'LICENSE', 'README'],
       },
+      {
+        type: 'list',
+        message: '🏛 Choose the code hosting platform',
+        name: 'hostingPlatform',
+        choices: ['GitHub', 'GitLab'],
+        when(allAnswers): boolean {
+          return allAnswers.extraOptions.includes('git');
+        },
+      },
+      {
+        type: 'input',
+        message: `🏛 Enter your GitHub or GitLab username`,
+        name: 'platformUsername',
+        when(allAnswers): boolean {
+          return allAnswers.extraOptions.includes('git');
+        },
+      },
+      {
+        type: 'input',
+        message: '🏛 Enter your repository name',
+        name: 'repositoryName',
+        when(allAnswers): boolean {
+          return allAnswers.extraOptions.includes('git');
+        },
+      },
+      {
+        type: 'list',
+        message: '📜 Choose the License type',
+        name: 'licenseType',
+        choices: ['MIT', 'Apache', 'BSD', 'ISC', 'GPL'],
+        when(allAnswers): boolean {
+          return allAnswers.extraOptions.includes('LICENSE');
+        },
+      },
+      {
+        type: 'input',
+        message: '📜 Enter your name for the License',
+        name: 'licenseAuthor',
+        when(allAnswers): boolean {
+          return allAnswers.extraOptions.includes('LICENSE');
+        },
+      },
     ])
     .catch((error) => console.error(error));
 
@@ -108,7 +150,12 @@ async function buildProject(): Promise<void> {
     answers.babel,
     answers.extraSettings,
     answers.extraOptions,
-    answers.tests
+    answers.tests,
+    answers.licenseType,
+    answers.licenseAuthor,
+    answers.hostingPlatform,
+    answers.platformUsername,
+    answers.repositoryName
   );
 }
 
