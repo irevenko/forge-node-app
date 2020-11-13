@@ -138,7 +138,11 @@ class PackageManager {
   static addPackageDetails(
     projectName: string,
     licenseType?: string,
-    licenseAuthor?: string
+    licenseAuthor?: string,
+    git?: boolean,
+    hostingPLatform?: string,
+    platformUsername?: string,
+    repositoryName?: string
   ): void {
     const scriptsSpinner = ora('📋 Adding Package Details...').start();
 
@@ -151,6 +155,15 @@ class PackageManager {
     pkgJSON.author = licenseAuthor || 'YOUR NAME <YOUR EMAIL>';
     pkgJSON.keywords = ['key', 'words'];
 
+    if (git) {
+      pkgJSON.repository = {
+        type: 'git',
+        url: `https://${hostingPLatform!.toLowerCase()}.com/${platformUsername}/${repositoryName}`,
+      };
+      pkgJSON.bugs = {
+        url: `https://${hostingPLatform!.toLowerCase()}.com/${platformUsername}/${repositoryName}/issues`
+      };
+    }
     fs.writeFileSync(
       `${projectName}/package.json`,
       JSON.stringify(pkgJSON, null, 2)

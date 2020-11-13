@@ -20,9 +20,13 @@ export interface IPackage {
   author?: string;
   keywords?: Array<string>;
   license?: string;
-  // homepage
-  // repository: {type, url}
-  // bugs {url}
+  repository?: {
+    type: string;
+    url: string;
+  };
+  bugs?: {
+    url: string;
+  };
   main: string;
   scripts: {
     'start:source'?: string;

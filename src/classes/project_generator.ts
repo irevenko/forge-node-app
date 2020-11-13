@@ -14,6 +14,7 @@ import {
   jestESFile,
   jestConfig,
 } from '../config/misc';
+import tsConfig from '../config/ts_config';
 
 class ProjectGenerator {
   static handleProjectSettings(
@@ -61,7 +62,15 @@ class ProjectGenerator {
     }
 
     ProjectGenerator.createSourceFolder(projectName, typeScript, babel);
-    PackageManager.addPackageDetails(projectName, licenseType!, licenseAuthor!);
+    PackageManager.addPackageDetails(
+      projectName,
+      licenseType!,
+      licenseAuthor!,
+      extraOptions?.includes('git'),
+      hostingPlatform,
+      platformUsername,
+      repositoryName
+    );
     PackageManager.createScripts(
       projectName,
       typeScript,
@@ -115,17 +124,30 @@ class ProjectGenerator {
     console.log(
       chalk.greenBright(`🚀 cd ${projectName} && ${pkgManager} start`)
     );
+
     if (extraOptions?.includes('git')) {
+      console.log(chalk.redBright('Dont forget to create repo at:'));
+      console.log(
+        chalk.cyanBright(
+          `https://${hostingPlatform!.toLowerCase()}.com/${platformUsername}/${repositoryName}`
+        )
+      );
       console.log(
         chalk.redBright('Do not forget to push your files to the repo')
       );
-      console.log('git add . && git commit -m "Initial commit"');
-      console.log('git push origin master');
+      console.log(
+        chalk.cyanBright('git add . && git commit -m "Initial commit"')
+      );
+      console.log(chalk.cyanBright('git push origin master'));
     }
   }
 
   static initTypeScript(projectName: string): void {
     execSync(`cd ${projectName} && npx tsc --init`, { stdio: 'ignore' });
+    fs.writeFileSync(
+      `${projectName}/tsconfig.json`,
+      JSON.stringify(tsConfig, null, 2)
+    );
   }
 
   static createSourceFolder(
@@ -259,17 +281,41 @@ class ProjectGenerator {
           })
         );
         break;
-      case 'Apache':
-        fs.writeFileSync(`${projectName}/LICENSE`, getLicense('Apache-2.0'));
+      case 'Apache-2.0':
+        fs.writeFileSync(
+          `${projectName}/LICENSE`,
+          getLicense('Apache-2.0', {
+            author: licenseAuthor || '<your name>',
+            year: `${new Date().getFullYear()}`,
+          })
+        );
         break;
-      case 'GPL':
-        fs.writeFileSync(`${projectName}/LICENSE`, getLicense('GPL-3.0'));
+      case 'GPL-3.0':
+        fs.writeFileSync(
+          `${projectName}/LICENSE`,
+          getLicense('GPL-3.0', {
+            author: licenseAuthor || '<your name>',
+            year: `${new Date().getFullYear()}`,
+          })
+        );
         break;
       case 'ISC':
-        fs.writeFileSync(`${projectName}/LICENSE`, getLicense('ISC'));
+        fs.writeFileSync(
+          `${projectName}/LICENSE`,
+          getLicense('ISC', {
+            author: licenseAuthor || '<your name>',
+            year: `${new Date().getFullYear()}`,
+          })
+        );
         break;
-      case 'BSD':
-        fs.writeFileSync(`${projectName}/LICENSE`, getLicense('BSD-3-Clause'));
+      case 'BSD-3-Clause':
+        fs.writeFileSync(
+          `${projectName}/LICENSE`,
+          getLicense('BSD-3-Clause', {
+            author: licenseAuthor || '<your name>',
+            year: `${new Date().getFullYear()}`,
+          })
+        );
         break;
     }
 

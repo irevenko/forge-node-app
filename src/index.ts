@@ -125,7 +125,7 @@ async function buildProject(): Promise<void> {
         type: 'list',
         message: '📜 Choose the License type',
         name: 'licenseType',
-        choices: ['MIT', 'Apache', 'BSD', 'ISC', 'GPL'],
+        choices: ['MIT', 'Apache-2.0', 'BSD-3-Clause', 'ISC', 'GPL-3.0'],
         when(allAnswers): boolean {
           return allAnswers.extraOptions.includes('LICENSE');
         },
