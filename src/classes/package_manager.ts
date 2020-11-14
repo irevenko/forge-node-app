@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import fs from 'fs';
 import ora from 'ora';
-import { execSync, spawn } from 'child_process';
+import { execSync } from 'child_process';
 import { IPackage } from '../interfaces';
 import {
   babelDependencies,
@@ -11,6 +11,9 @@ import {
   eslintTsDependencies,
   lintFormatDependencies,
   tsDependencies,
+  lintAirBnbDependencies,
+  lintGoogleDependencies,
+  lintStandardDependencies,
 } from '../config/dependencies';
 import {
   eslintIgnore,
@@ -21,12 +24,7 @@ import {
   prettierConfig,
   babelConfig,
 } from '../config/misc';
-import esjs from '../config/eslint/eslint_js';
-import ests from '../config/eslint/eslint_ts';
-import esbabel from '../config/eslint/eslint_babel';
-import esjsPretty from '../config/eslint/eslint_prettier_js';
-import estsPretty from '../config/eslint/eslint_prettier_ts';
-import esbabelPretty from '../config/eslint/eslint_prettier_babel';
+import esLint from '../config/eslint/index.eslint';
 
 class PackageManager {
   static initPackage(
@@ -161,9 +159,10 @@ class PackageManager {
         url: `https://${hostingPLatform!.toLowerCase()}.com/${platformUsername}/${repositoryName}`,
       };
       pkgJSON.bugs = {
-        url: `https://${hostingPLatform!.toLowerCase()}.com/${platformUsername}/${repositoryName}/issues`
+        url: `https://${hostingPLatform!.toLowerCase()}.com/${platformUsername}/${repositoryName}/issues`,
       };
     }
+
     fs.writeFileSync(
       `${projectName}/package.json`,
       JSON.stringify(pkgJSON, null, 2)
@@ -211,7 +210,7 @@ class PackageManager {
   static addEslint(
     projectName: string,
     pkgManager: string,
-    eslintQuestions: string,
+    eslintConfig: string,
     typeScript: boolean,
     babel: boolean,
     prettier: boolean
@@ -241,42 +240,182 @@ class PackageManager {
         });
       }
     }
-
-    if (eslintQuestions === 'Answer questions') {
-      process.chdir(projectName); // Beacuse execSync does not change dir directly
-      spawn('npx', ['eslint', '--init'], { stdio: 'inherit' });
-    } else {
-      if (typeScript && prettier) {
-        fs.writeFileSync(
-          `${projectName}/.eslintrc.json`,
-          JSON.stringify(estsPretty, null, 2)
-        );
-      } else if (typeScript) {
-        fs.writeFileSync(
-          `${projectName}/.eslintrc.json`,
-          JSON.stringify(ests, null, 2)
-        );
-      } else if (babel && prettier) {
-        fs.writeFileSync(
-          `${projectName}/.eslintrc.json`,
-          JSON.stringify(esbabelPretty, null, 2)
-        );
-      } else if (babel) {
-        fs.writeFileSync(
-          `${projectName}/.eslintrc.json`,
-          JSON.stringify(esbabel, null, 2)
-        );
-      } else if (prettier) {
-        fs.writeFileSync(
-          `${projectName}/.eslintrc.json`,
-          JSON.stringify(esjsPretty, null, 2)
-        );
-      } else {
-        fs.writeFileSync(
-          `${projectName}/.eslintrc.json`,
-          JSON.stringify(esjs, null, 2)
-        );
-      }
+    // eslint-disable-next-line default-case
+    switch (eslintConfig) {
+      case 'Only Errors':
+        if (typeScript && prettier) {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.tsPretty, null, 2)
+          );
+        } else if (typeScript) {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.ts, null, 2)
+          );
+        } else if (babel && prettier) {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.babelPretty, null, 2)
+          );
+        } else if (babel) {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.babel, null, 2)
+          );
+        } else if (prettier) {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.jsPretty, null, 2)
+          );
+        } else {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.js, null, 2)
+          );
+        }
+        break;
+      case 'AirBNB':
+        if (typeScript && prettier) {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.airBnb.tsPretty, null, 2)
+          );
+        } else if (typeScript) {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.airBnb.ts, null, 2)
+          );
+        } else if (babel && prettier) {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.airBnb.babelPretty, null, 2)
+          );
+        } else if (babel) {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.airBnb.babel, null, 2)
+          );
+        } else if (prettier) {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.airBnb.jsPretty, null, 2)
+          );
+        } else {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.airBnb.js, null, 2)
+          );
+        }
+        if (pkgManager === 'npm') {
+          execSync(`cd ${projectName} && npm i ${lintAirBnbDependencies} -D`, {
+            stdio: 'ignore',
+          });
+        }
+        if (pkgManager === 'yarn') {
+          execSync(
+            `cd ${projectName} && yarn add ${lintAirBnbDependencies} -D`,
+            {
+              stdio: 'ignore',
+            }
+          );
+        }
+        break;
+      case 'Google':
+        if (typeScript && prettier) {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.google.tsPretty, null, 2)
+          );
+        } else if (typeScript) {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.google.ts, null, 2)
+          );
+        } else if (babel && prettier) {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.google.babelPretty, null, 2)
+          );
+        } else if (babel) {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.google.babel, null, 2)
+          );
+        } else if (prettier) {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.google.jsPretty, null, 2)
+          );
+        } else {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.google.js, null, 2)
+          );
+        }
+        if (pkgManager === 'npm') {
+          execSync(`cd ${projectName} && npm i ${lintGoogleDependencies} -D`, {
+            stdio: 'ignore',
+          });
+        }
+        if (pkgManager === 'yarn') {
+          execSync(
+            `cd ${projectName} && yarn add ${lintGoogleDependencies} -D`,
+            {
+              stdio: 'ignore',
+            }
+          );
+        }
+        break;
+      case 'Standard':
+        if (typeScript && prettier) {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.standard.tsPretty, null, 2)
+          );
+        } else if (typeScript) {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.standard.ts, null, 2)
+          );
+        } else if (babel && prettier) {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.standard.babelPretty, null, 2)
+          );
+        } else if (babel) {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.standard.babel, null, 2)
+          );
+        } else if (prettier) {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.standard.jsPretty, null, 2)
+          );
+        } else {
+          fs.writeFileSync(
+            `${projectName}/.eslintrc.json`,
+            JSON.stringify(esLint.standard.js, null, 2)
+          );
+        }
+        if (pkgManager === 'npm') {
+          execSync(
+            `cd ${projectName} && npm i ${lintStandardDependencies} -D`,
+            {
+              stdio: 'ignore',
+            }
+          );
+        }
+        if (pkgManager === 'yarn') {
+          execSync(
+            `cd ${projectName} && yarn add ${lintStandardDependencies} -D`,
+            {
+              stdio: 'ignore',
+            }
+          );
+        }
+        break;
     }
 
     linterSpinner.succeed('🔎 Added ESLint');

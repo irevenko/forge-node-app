@@ -21,9 +21,9 @@ class ProjectGenerator {
     projectName: string,
     pkgManager: string,
     pkgQuestions: string,
-    eslintQuestions: string,
     typeScript: boolean,
     babel: boolean,
+    eslintConfig?: string,
     extraSettings?: Array<string>,
     extraOptions?: Array<string>,
     tests?: string,
@@ -106,7 +106,7 @@ class ProjectGenerator {
         PackageManager.addEslint(
           projectName,
           pkgManager,
-          eslintQuestions,
+          eslintConfig!,
           typeScript,
           babel,
           extraSettings.includes('Prettier')

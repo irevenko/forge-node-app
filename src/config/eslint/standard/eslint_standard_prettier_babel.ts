@@ -1,10 +1,11 @@
 /* eslint-disable prettier/prettier */
-const esBabelPretty = {
+const esStandardBabelPretty = {
   env: {
     node: true,
     es2021: true,
   },
   extends: [
+    'standard',
     'eslint:recommended',
     'plugin:node/recommended',
     'plugin:prettier/recommended',
@@ -25,4 +26,4 @@ const esBabelPretty = {
   },
 };
 
-export default esBabelPretty;
+export default esStandardBabelPretty;

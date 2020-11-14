@@ -1,20 +1,21 @@
 /* eslint-disable prettier/prettier */
-const esTs = {
+const esAirBnbJsPretty = {
   env: {
-    es2021: true,
     node: true,
+    es2021: true,
   },
   extends: [
+    'airbnb-base',
     'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
     'plugin:node/recommended',
+    'prettier',
+    'plugin:prettier/recommended',
   ],
-  parser: '@typescript-eslint/parser',
+  plugins: ['prettier'],
   parserOptions: {
     ecmaVersion: 12,
   },
-  plugins: ['@typescript-eslint'],
   rules: {},
 };
 
-export default esTs;
+export default esAirBnbJsPretty;

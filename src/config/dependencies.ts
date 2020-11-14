@@ -9,6 +9,14 @@ export const eslintTsDependencies =
 export const lintFormatDependencies =
   'eslint-config-prettier eslint-plugin-prettier';
 
+export const lintAirBnbDependencies =
+  'eslint-plugin-import eslint-config-airbnb-base';
+
+export const lintStandardDependencies =
+  'eslint-plugin-import eslint-config-standard eslint-plugin-promise';
+
+export const lintGoogleDependencies = 'eslint-config-google';
+
 export const babelDependencies =
   '@babel/cli @babel/core @babel/node @babel/preset-env';
 

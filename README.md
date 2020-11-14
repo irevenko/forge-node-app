@@ -23,7 +23,6 @@ Feel free to check issues page
 
 # ToDo
 - !New tsconf for TS projects
-- !Google AirBNB Standart + Prettier 
 - Add yargs (all questions but with args)
 - Re:Check Vue CLI and create-node-app(yargs) (good practices)
 - Extend JEST, Babel configs
@@ -31,4 +30,4 @@ Feel free to check issues page
 - Add logo
 - Add logger
 - Add Presets
-- Final code review and fixes (indentation, and other things)
+- Final code review and fixes (indentation, eslint rules in comments, and other things)

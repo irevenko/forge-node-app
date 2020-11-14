@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node out/index.js",
     "dev": "ts-node src/index.ts",
-    "format": "prettier src/classes/*.ts --write",
+    "format": "prettier src/**/*.ts --write",
     "linter:fix": "eslint src/*.ts --fix"
   },
   "repository": {

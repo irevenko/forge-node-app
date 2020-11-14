@@ -83,9 +83,9 @@ async function buildProject(): Promise<void> {
       },
       {
         type: 'list',
-        message: '🔎 Do you want to answer ESLint questions?',
-        name: 'eslintQuestions',
-        choices: ['Go with defaults', 'Answer questions'],
+        message: '🔎 Pick ESLint config:',
+        name: 'eslintConfig',
+        choices: ['Only Errors', 'AirBNB', 'Google', 'Standard'],
         when(allAnswers): boolean {
           return allAnswers.extraSettings.includes('ESLint');
         },
@@ -145,9 +145,9 @@ async function buildProject(): Promise<void> {
     answers.projectName.trim(),
     answers.pkgManager,
     answers.pkgQuestions,
-    answers.eslintQuestions,
     answers.typeScript,
     answers.babel,
+    answers.eslintConfig,
     answers.extraSettings,
     answers.extraOptions,
     answers.tests,

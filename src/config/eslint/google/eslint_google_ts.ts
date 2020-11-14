@@ -1,10 +1,11 @@
 /* eslint-disable prettier/prettier */
-const esTs = {
+const esGoogleTs = {
   env: {
     es2021: true,
     node: true,
   },
   extends: [
+    'google',
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:node/recommended',
@@ -17,4 +18,4 @@ const esTs = {
   rules: {},
 };
 
-export default esTs;
+export default esGoogleTs;

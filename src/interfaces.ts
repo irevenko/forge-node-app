@@ -2,9 +2,9 @@ export interface IAnswers {
   projectName: string;
   pkgManager: string;
   pkgQuestions: string;
-  eslintQuestions: string;
   typeScript: boolean;
   babel: boolean;
+  eslintConfig?: string;
   extraSettings?: Array<string>;
   extraOptions: Array<string>;
   tests?: string;

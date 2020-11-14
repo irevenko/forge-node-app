@@ -1,20 +1,20 @@
 /* eslint-disable prettier/prettier */
-const esjsPretty = {
+const esJsPretty = {
   env: {
     node: true,
-    es2021: true
+    es2021: true,
   },
   extends: [
-    "eslint:recommended",
-    "plugin:node/recommended",
-    "prettier",
-    "plugin:prettier/recommended"
+    'eslint:recommended',
+    'plugin:node/recommended',
+    'prettier',
+    'plugin:prettier/recommended',
   ],
-  plugins: ["prettier"],
+  plugins: ['prettier'],
   parserOptions: {
-    ecmaVersion: 12
+    ecmaVersion: 12,
   },
-  rules: {}
-}
+  rules: {},
+};
 
-export default esjsPretty;
+export default esJsPretty;

@@ -1,10 +1,11 @@
 /* eslint-disable prettier/prettier */
-const esBabelPretty = {
+const esGoogleBabelPretty = {
   env: {
     node: true,
     es2021: true,
   },
   extends: [
+    'google',
     'eslint:recommended',
     'plugin:node/recommended',
     'plugin:prettier/recommended',
@@ -25,4 +26,4 @@ const esBabelPretty = {
   },
 };
 
-export default esBabelPretty;
+export default esGoogleBabelPretty;
