@@ -40,3 +40,7 @@ export interface IPackage {
     'lint:fix'?: string;
   };
 }
+
+export interface IPresetAnswers {
+  presetChoice: string;
+}
