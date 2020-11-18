@@ -32,7 +32,9 @@ class PackageManager {
     pkgManager: string,
     pkgQuestions: string
   ): void {
-    const packageSpinner = ora('🔨 Initializing The Package...').start();
+    const packageSpinner = ora(
+      `🔨 Initializing The Package with ${pkgManager}...`
+    ).start();
 
     fs.mkdirSync(projectName);
     if (pkgQuestions === 'Go with defaults') {
@@ -42,7 +44,8 @@ class PackageManager {
     } else {
       execSync(`cd ${projectName} && ${pkgManager} init`, { stdio: 'inherit' });
     }
-    packageSpinner.succeed('🔨 Initialized The Package');
+
+    packageSpinner.succeed(`🔨 Initialized The Package with ${pkgManager}`);
   }
 
   static createScripts(
@@ -142,7 +145,7 @@ class PackageManager {
     platformUsername?: string,
     repositoryName?: string
   ): void {
-    const scriptsSpinner = ora('📋 Adding Package Details...').start();
+    const detailsSpinner = ora('📋 Adding Package Details...').start();
 
     const pkgJSON: IPackage = JSON.parse(
       fs.readFileSync(`${projectName}/package.json`, 'utf8')
@@ -168,7 +171,7 @@ class PackageManager {
       JSON.stringify(pkgJSON, null, 2)
     );
 
-    scriptsSpinner.succeed('📋 Added Package Details');
+    detailsSpinner.succeed('📋 Added Package Details');
   }
 
   static installTsDependencies(pkgManager: string, projectName: string): void {
@@ -189,7 +192,7 @@ class PackageManager {
   }
 
   static addBabel(projectName: string, pkgManager: string): void {
-    const prettierSpinner = ora('🐠 Adding Babel...').start();
+    const babelSpinner = ora('🐠 Adding Babel...').start();
 
     if (pkgManager === 'npm') {
       execSync(`cd ${projectName} && npm i ${babelDependencies} -D`, {
@@ -204,7 +207,7 @@ class PackageManager {
 
     fs.writeFileSync(`${projectName}/.babelrc`, babelConfig);
 
-    prettierSpinner.succeed('🐠 Added Babel');
+    babelSpinner.succeed('🐠 Added Babel');
   }
 
   static addEslint(
@@ -548,7 +551,7 @@ class PackageManager {
     typeScript: boolean,
     babel: boolean
   ): void {
-    const nodemonSpinner = ora('🃏 Adding Jest...').start();
+    const jestSpinner = ora('🃏 Adding Jest...').start();
 
     if (pkgManager === 'npm') {
       typeScript
@@ -591,7 +594,7 @@ class PackageManager {
       );
     }
 
-    nodemonSpinner.succeed('🃏 Added Jest');
+    jestSpinner.succeed('🃏 Added Jest');
   }
 
   static addMochaChai(
@@ -600,7 +603,7 @@ class PackageManager {
     typeScript: boolean,
     babel: boolean
   ): void {
-    const nodemonSpinner = ora('🍵 Adding Mocha & Chai...').start();
+    const mochaChaiSpinner = ora('🍵 Adding Mocha & Chai...').start();
 
     if (pkgManager === 'npm') {
       typeScript
@@ -644,7 +647,7 @@ class PackageManager {
       }
     }
 
-    nodemonSpinner.succeed('🍵 Added Mocha & Chai');
+    mochaChaiSpinner.succeed('🍵 Added Mocha & Chai');
   }
 }
 

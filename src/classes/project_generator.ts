@@ -1,4 +1,6 @@
 import fs from 'fs';
+import { homedir } from 'os';
+import path from 'path';
 import ora from 'ora';
 import chalk from 'chalk';
 import { getLicense } from 'license';
@@ -15,6 +17,7 @@ import {
   jestConfig,
 } from '../config/misc';
 import tsConfig from '../config/ts_config';
+import { IPreset } from '../interfaces';
 
 class ProjectGenerator {
   static handleProjectSettings(
@@ -31,7 +34,9 @@ class ProjectGenerator {
     licenseAuthor?: string,
     hostingPlatform?: string,
     platformUsername?: string,
-    repositoryName?: string
+    repositoryName?: string,
+    savePreset?: boolean,
+    presetName?: string
   ): void {
     PackageManager.initPackage(projectName, pkgManager, pkgQuestions);
 
@@ -89,35 +94,37 @@ class ProjectGenerator {
       PackageManager.addMochaChai(projectName, pkgManager, typeScript, babel);
     }
 
-    if (extraSettings) {
-      if (extraSettings.includes('Prettier')) {
-        PackageManager.addPrettier(projectName, pkgManager);
-      }
-      if (
-        extraSettings.includes('ESLint') &&
-        extraSettings.includes('Prettier')
-      ) {
-        PackageManager.attachLinterWithPrettier(projectName, pkgManager);
-      }
-      if (extraSettings.includes('ESLint') && babel) {
-        PackageManager.attachLinterWithBabel(projectName, pkgManager);
-      }
-      if (extraSettings.includes('ESLint')) {
-        PackageManager.addEslint(
-          projectName,
-          pkgManager,
-          eslintConfig!,
-          typeScript,
-          babel,
-          extraSettings.includes('Prettier')
-        );
-      }
-      if (extraSettings.includes('dotenv')) {
-        PackageManager.addDotenv(projectName, pkgManager, typeScript, babel);
-      }
-      if (extraSettings.includes('nodemon or ts-node-dev')) {
-        PackageManager.addChangesMonitor(projectName, pkgManager, typeScript);
-      }
+    if (extraSettings!.includes('Prettier')) {
+      PackageManager.addPrettier(projectName, pkgManager);
+    }
+    if (
+      extraSettings!.includes('ESLint') &&
+      extraSettings!.includes('Prettier')
+    ) {
+      PackageManager.attachLinterWithPrettier(projectName, pkgManager);
+    }
+    if (extraSettings!.includes('ESLint') && babel) {
+      PackageManager.attachLinterWithBabel(projectName, pkgManager);
+    }
+    if (extraSettings!.includes('ESLint')) {
+      PackageManager.addEslint(
+        projectName,
+        pkgManager,
+        eslintConfig!,
+        typeScript,
+        babel,
+        extraSettings!.includes('Prettier')
+      );
+    }
+    if (extraSettings!.includes('dotenv')) {
+      PackageManager.addDotenv(projectName, pkgManager, typeScript, babel);
+    }
+    if (extraSettings!.includes('nodemon or ts-node-dev')) {
+      PackageManager.addChangesMonitor(projectName, pkgManager, typeScript);
+    }
+
+    if (savePreset) {
+      ProjectGenerator.savePreset(presetName!);
     }
 
     console.log(chalk.greenBright('🎉 Ready!'));
@@ -176,7 +183,7 @@ class ProjectGenerator {
     babel: boolean,
     testingFramework: string
   ): void {
-    const srcSpinner = ora('📂 Creating Tests Folder...').start();
+    const testsSpinner = ora('📂 Creating Tests Folder...').start();
 
     fs.mkdirSync(`${projectName}/__tests__`, { recursive: true });
 
@@ -221,7 +228,7 @@ class ProjectGenerator {
         }
     }
 
-    srcSpinner.succeed('📂 Created Tests Folder');
+    testsSpinner.succeed('📂 Created Tests Folder');
   }
 
   static initGit(
@@ -230,7 +237,7 @@ class ProjectGenerator {
     platformUsername: string,
     repositoryName: string
   ): void {
-    const srcSpinner = ora('📚 Initializing git...').start();
+    const gitSpinner = ora('📚 Initializing git...').start();
 
     execSync(`cd ${projectName} && git init`, { stdio: 'ignore' });
 
@@ -252,15 +259,15 @@ class ProjectGenerator {
 
     execSync(`cd ${projectName} && npx gitignore node`, { stdio: 'ignore' });
 
-    srcSpinner.succeed('📚 Initialized git');
+    gitSpinner.succeed('📚 Initialized git');
   }
 
   static addReadme(projectName: string): void {
-    const srcSpinner = ora('📄 Creating README...').start();
+    const readmeSpinner = ora('📄 Creating README...').start();
 
     fs.writeFileSync(`${projectName}/README.md`, `# ${projectName}`);
 
-    srcSpinner.succeed('📄 Created README');
+    readmeSpinner.succeed('📄 Created README');
   }
 
   static addLicense(
@@ -268,7 +275,7 @@ class ProjectGenerator {
     licenseType: string,
     licenseAuthor: string
   ): void {
-    const srcSpinner = ora('📜 Creating License...').start();
+    const licenseSpinner = ora('📜 Creating License...').start();
 
     // eslint-disable-next-line default-case
     switch (licenseType) {
@@ -319,7 +326,100 @@ class ProjectGenerator {
         break;
     }
 
-    srcSpinner.succeed('📜 Created License');
+    licenseSpinner.succeed('📜 Created License');
+  }
+
+  static savePreset(presetName: string): void {
+    const savePresetSpinner = ora('Saving preset...').start();
+
+    if (!fs.existsSync(path.join(homedir(), '.forge-node-app-rc'))) {
+      fs.writeFileSync(path.join(homedir(), '.forge-node-app-rc'), '{\n}');
+    } else {
+      const presetsConfig: { [key: string]: any } = JSON.parse(
+        fs.readFileSync(`${path.join(homedir())}/.forge-node-app-rc`, 'utf-8')
+      );
+
+      presetsConfig[presetName] = {};
+
+      fs.writeFileSync(
+        path.join(homedir(), '.forge-node-app-rc'),
+        JSON.stringify(presetsConfig, null, 2)
+      );
+    }
+
+    savePresetSpinner.succeed('Saved preset');
+  }
+
+  static loadPresets(): Array<string> {
+    if (!fs.existsSync(path.join(homedir(), '.forge-node-app-rc'))) {
+      fs.writeFileSync(path.join(homedir(), '.forge-node-app-rc'), '{\n}');
+    }
+
+    const presets: IPreset = JSON.parse(
+      fs.readFileSync(`${path.join(homedir())}/.forge-node-app-rc`, 'utf-8')
+    );
+
+    return Object.keys(presets);
+  }
+
+  static handleProjectWithCustomPreset(presetName: string): void {
+    const presetProjectSpinner = ora(
+      `Generating app using ${presetName} preset...`
+    ).start();
+
+    // read preset file and ProjectGenerator.handleProjectSettings using specific preset
+
+    presetProjectSpinner.succeed(`Generated app using ${presetName} preset`);
+  }
+
+  static handleProjectWithDefaultPreset(presetName: string): void {
+    const presetProjectSpinner = ora(
+      `Generating app using ${presetName}`
+    ).start();
+
+    // eslint-disable-next-line default-case
+    switch (presetName) {
+      case 'Default (yarn, TypeScript, ESLint (Errors only), Jest)':
+        ProjectGenerator.handleProjectSettings(
+          'node-app',
+          'yarn',
+          'Go with defaults',
+          true,
+          false,
+          'Only Errors',
+          ['ESLint', 'Unit Tests'],
+          undefined,
+          'Jest'
+        );
+        break;
+      case 'Default (npm, JavaScript, ESLint (AirBNB), Mocha + Chai)':
+        ProjectGenerator.handleProjectSettings(
+          'node-app',
+          'npm',
+          'Go with defaults',
+          false,
+          false,
+          'AirBNB',
+          ['ESLint', 'Unit Tests'],
+          undefined,
+          'Mocha + Chai'
+        );
+        break;
+      case 'Default (npm, Babel, ESLint (AirBNB), nodemon)':
+        ProjectGenerator.handleProjectSettings(
+          'node-app',
+          'npm',
+          'Go with defaults',
+          false,
+          true,
+          'AirBNB',
+          ['ESLint', 'Unit Tests', 'nodemon or ts-node-dev'],
+          undefined
+        );
+        break;
+    }
+
+    presetProjectSpinner.succeed(`Generated app using ${presetName}`);
   }
 }
 

@@ -13,6 +13,8 @@ export interface IAnswers {
   hostingPlatform?: string;
   platformUsername?: string;
   repositoryName?: string;
+  savePreset?: boolean;
+  presetName?: string;
 }
 
 export interface IPackage {
@@ -43,4 +45,10 @@ export interface IPackage {
 
 export interface IPresetAnswers {
   presetChoice: string;
+}
+
+export interface IPreset {
+  [key: string]: {
+    typeScript?: boolean;
+  };
 }

@@ -4,15 +4,18 @@ import { IAnswers, IPresetAnswers } from './interfaces';
 import ProjectGenerator from './classes/project_generator';
 
 async function buildProject(): Promise<void> {
+  const presets = ProjectGenerator.loadPresets();
+
   const presetAnswers: IPresetAnswers = await inquirer.prompt([
     {
       type: 'list',
       message: '💾 Pick the preset:',
       name: 'presetChoice',
       choices: [
-        'Default (npm, TypeScript, ESLint (Errors only), Jest)',
+        ...presets,
+        'Default (yarn, TypeScript, ESLint (Errors only), Jest)',
         'Default (npm, JavaScript, ESLint (AirBNB), Mocha + Chai)',
-        'Default (yarn, Babel, ESLint (AirBNB), nodemon)',
+        'Default (npm, Babel, ESLint (AirBNB), nodemon)',
         'Manualy select features',
       ],
     },
@@ -184,10 +187,28 @@ async function buildProject(): Promise<void> {
       answers.licenseAuthor,
       answers.hostingPlatform,
       answers.platformUsername,
-      answers.repositoryName
+      answers.repositoryName,
+      answers.savePreset,
+      answers.presetName
     );
   } else {
-    // generate project with preset settings
+    // eslint-disable-next-line no-lonely-if
+    if (
+      presetAnswers.presetChoice ===
+        'Default (yarn, TypeScript, ESLint (Errors only), Jest)' ||
+      presetAnswers.presetChoice ===
+        'Default (npm, JavaScript, ESLint (AirBNB), Mocha + Chai)' ||
+      presetAnswers.presetChoice ===
+        'Default (npm, Babel, ESLint (AirBNB), nodemon)'
+    ) {
+      ProjectGenerator.handleProjectWithDefaultPreset(
+        presetAnswers.presetChoice
+      );
+    }
+
+    // else pick config created by user
+    // read cfg file and handleProjectSettings with settings from cfg
+    // ProjectGenerator.handleProjectWithCustomPreset
   }
 }
 
