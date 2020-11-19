@@ -17,7 +17,7 @@ import {
   jestConfig,
 } from '../config/misc';
 import tsConfig from '../config/ts_config';
-import { IPreset } from '../interfaces';
+import { IPreset, IAnswers } from '../interfaces';
 
 class ProjectGenerator {
   static handleProjectSettings(
@@ -27,7 +27,7 @@ class ProjectGenerator {
     typeScript: boolean,
     babel: boolean,
     eslintConfig?: string,
-    extraSettings?: Array<string>,
+    extraLibs?: Array<string>,
     extraOptions?: Array<string>,
     tests?: string,
     licenseType?: string,
@@ -80,7 +80,7 @@ class ProjectGenerator {
       projectName,
       typeScript,
       babel,
-      extraSettings,
+      extraLibs,
       tests
     );
 
@@ -94,37 +94,49 @@ class ProjectGenerator {
       PackageManager.addMochaChai(projectName, pkgManager, typeScript, babel);
     }
 
-    if (extraSettings!.includes('Prettier')) {
+    if (extraLibs!.includes('Prettier')) {
       PackageManager.addPrettier(projectName, pkgManager);
     }
-    if (
-      extraSettings!.includes('ESLint') &&
-      extraSettings!.includes('Prettier')
-    ) {
+    if (extraLibs!.includes('ESLint') && extraLibs!.includes('Prettier')) {
       PackageManager.attachLinterWithPrettier(projectName, pkgManager);
     }
-    if (extraSettings!.includes('ESLint') && babel) {
+    if (extraLibs!.includes('ESLint') && babel) {
       PackageManager.attachLinterWithBabel(projectName, pkgManager);
     }
-    if (extraSettings!.includes('ESLint')) {
+    if (extraLibs!.includes('ESLint')) {
       PackageManager.addEslint(
         projectName,
         pkgManager,
         eslintConfig!,
         typeScript,
         babel,
-        extraSettings!.includes('Prettier')
+        extraLibs!.includes('Prettier')
       );
     }
-    if (extraSettings!.includes('dotenv')) {
+    if (extraLibs!.includes('dotenv')) {
       PackageManager.addDotenv(projectName, pkgManager, typeScript, babel);
     }
-    if (extraSettings!.includes('nodemon or ts-node-dev')) {
+    if (extraLibs!.includes('nodemon or ts-node-dev')) {
       PackageManager.addChangesMonitor(projectName, pkgManager, typeScript);
     }
 
     if (savePreset) {
-      ProjectGenerator.savePreset(presetName!);
+      ProjectGenerator.savePreset(presetName!, {
+        projectName,
+        pkgManager,
+        pkgQuestions,
+        typeScript,
+        babel,
+        eslintConfig,
+        extraLibs,
+        extraOptions,
+        tests,
+        licenseType,
+        licenseAuthor,
+        hostingPlatform,
+        platformUsername,
+        repositoryName,
+      });
     }
 
     console.log(chalk.greenBright('🎉 Ready!'));
@@ -329,25 +341,57 @@ class ProjectGenerator {
     licenseSpinner.succeed('📜 Created License');
   }
 
-  static savePreset(presetName: string): void {
-    const savePresetSpinner = ora('Saving preset...').start();
+  static savePreset(presetName: string, settings: IAnswers): void {
+    const savePresetSpinner = ora('💾 Saving preset...').start();
+
+    const {
+      projectName,
+      pkgManager,
+      pkgQuestions,
+      typeScript,
+      babel,
+      eslintConfig,
+      extraLibs,
+      extraOptions,
+      tests,
+      licenseType,
+      licenseAuthor,
+      hostingPlatform,
+      platformUsername,
+      repositoryName,
+    } = settings;
 
     if (!fs.existsSync(path.join(homedir(), '.forge-node-app-rc'))) {
       fs.writeFileSync(path.join(homedir(), '.forge-node-app-rc'), '{\n}');
-    } else {
-      const presetsConfig: { [key: string]: any } = JSON.parse(
-        fs.readFileSync(`${path.join(homedir())}/.forge-node-app-rc`, 'utf-8')
-      );
-
-      presetsConfig[presetName] = {};
-
-      fs.writeFileSync(
-        path.join(homedir(), '.forge-node-app-rc'),
-        JSON.stringify(presetsConfig, null, 2)
-      );
     }
 
-    savePresetSpinner.succeed('Saved preset');
+    const presetsConfig: IPreset = JSON.parse(
+      fs.readFileSync(`${path.join(homedir())}/.forge-node-app-rc`, 'utf-8')
+    );
+
+    presetsConfig[presetName] = {
+      projectName,
+      pkgManager,
+      pkgQuestions,
+      typeScript,
+      babel,
+      eslintConfig,
+      extraLibs,
+      extraOptions,
+      tests,
+      licenseType,
+      licenseAuthor,
+      hostingPlatform,
+      platformUsername,
+      repositoryName,
+    };
+
+    fs.writeFileSync(
+      path.join(homedir(), '.forge-node-app-rc'),
+      JSON.stringify(presetsConfig, null, 2)
+    );
+
+    savePresetSpinner.succeed(`💾 Saved preset: ${presetName}`);
   }
 
   static loadPresets(): Array<string> {
@@ -363,20 +407,31 @@ class ProjectGenerator {
   }
 
   static handleProjectWithCustomPreset(presetName: string): void {
-    const presetProjectSpinner = ora(
-      `Generating app using ${presetName} preset...`
-    ).start();
+    const presets: IPreset = JSON.parse(
+      fs.readFileSync(`${path.join(homedir())}/.forge-node-app-rc`, 'utf-8')
+    );
 
-    // read preset file and ProjectGenerator.handleProjectSettings using specific preset
+    ProjectGenerator.handleProjectSettings(
+      presets[presetName].projectName,
+      presets[presetName].pkgManager,
+      presets[presetName].pkgQuestions,
+      presets[presetName].typeScript,
+      presets[presetName].babel,
+      presets[presetName].eslintConfig,
+      presets[presetName].extraLibs,
+      presets[presetName].extraOptions,
+      presets[presetName].tests,
+      presets[presetName].licenseType,
+      presets[presetName].licenseAuthor,
+      presets[presetName].hostingPlatform,
+      presets[presetName].platformUsername,
+      presets[presetName].repositoryName
+    );
 
-    presetProjectSpinner.succeed(`Generated app using ${presetName} preset`);
+    console.log(`🔧 Generated app using ${presetName} preset`);
   }
 
   static handleProjectWithDefaultPreset(presetName: string): void {
-    const presetProjectSpinner = ora(
-      `Generating app using ${presetName}`
-    ).start();
-
     // eslint-disable-next-line default-case
     switch (presetName) {
       case 'Default (yarn, TypeScript, ESLint (Errors only), Jest)':
@@ -418,8 +473,7 @@ class ProjectGenerator {
         );
         break;
     }
-
-    presetProjectSpinner.succeed(`Generated app using ${presetName}`);
+    console.log(`🔧 Generated app using ${presetName} preset`);
   }
 }
 

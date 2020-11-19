@@ -52,7 +52,7 @@ class PackageManager {
     projectName: string,
     typeScript: boolean,
     babel: boolean,
-    extraSettings?: Array<string>,
+    extraLibs?: Array<string>,
     tests?: string
   ): void {
     const scriptsSpinner = ora('📜 Creating Scripts...').start();
@@ -103,7 +103,7 @@ class PackageManager {
       }
     }
 
-    if (extraSettings!.includes('ESLint')) {
+    if (extraLibs!.includes('ESLint')) {
       typeScript
         ? (pkgJSON.scripts.lint = 'npx eslint src/*.ts')
         : (pkgJSON.scripts.lint = 'npx eslint src/*.js');
@@ -112,13 +112,13 @@ class PackageManager {
         : (pkgJSON.scripts['lint:fix'] = 'npx eslint src/*.js --fix');
     }
 
-    if (extraSettings!.includes('Prettier')) {
+    if (extraLibs!.includes('Prettier')) {
       typeScript
         ? (pkgJSON.scripts.format = 'npx prettier src/*.ts --write')
         : (pkgJSON.scripts.format = 'npx prettier src/*.js --write');
     }
 
-    if (extraSettings!.includes('nodemon or ts-node-dev')) {
+    if (extraLibs!.includes('nodemon or ts-node-dev')) {
       if (typeScript) {
         pkgJSON.scripts.dev = 'npx ts-node-dev --respawn src/index';
       } else if (babel) {

@@ -5,8 +5,8 @@ export interface IAnswers {
   typeScript: boolean;
   babel: boolean;
   eslintConfig?: string;
-  extraSettings?: Array<string>;
-  extraOptions: Array<string>;
+  extraLibs?: Array<string>;
+  extraOptions?: Array<string>;
   tests?: string;
   licenseType?: string;
   licenseAuthor?: string;
@@ -43,12 +43,25 @@ export interface IPackage {
   };
 }
 
-export interface IPresetAnswers {
-  presetChoice: string;
-}
-
 export interface IPreset {
   [key: string]: {
-    typeScript?: boolean;
+    projectName: string;
+    pkgManager: string;
+    pkgQuestions: string;
+    typeScript: boolean;
+    babel: boolean;
+    eslintConfig?: string;
+    extraLibs?: Array<string>;
+    extraOptions?: Array<string>;
+    tests?: string;
+    licenseType?: string;
+    licenseAuthor?: string;
+    hostingPlatform?: string;
+    platformUsername?: string;
+    repositoryName?: string;
   };
+}
+
+export interface IPresetAnswers {
+  presetChoice: string;
 }

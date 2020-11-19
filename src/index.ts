@@ -81,7 +81,7 @@ async function buildProject(): Promise<void> {
         {
           type: 'checkbox',
           message: '⚙️  Pick the config:',
-          name: 'extraSettings',
+          name: 'extraLibs',
           choices: [
             'ESLint',
             'Prettier',
@@ -96,7 +96,7 @@ async function buildProject(): Promise<void> {
           name: 'tests',
           choices: ['Jest', 'Mocha + Chai'],
           when(allAnswers): boolean {
-            return allAnswers.extraSettings.includes('Unit Tests');
+            return allAnswers.extraLibs.includes('Unit Tests');
           },
         },
         {
@@ -105,7 +105,7 @@ async function buildProject(): Promise<void> {
           name: 'eslintConfig',
           choices: ['Only Errors', 'AirBNB', 'Google', 'Standard'],
           when(allAnswers): boolean {
-            return allAnswers.extraSettings.includes('ESLint');
+            return allAnswers.extraLibs.includes('ESLint');
           },
         },
         {
@@ -116,7 +116,7 @@ async function buildProject(): Promise<void> {
         },
         {
           type: 'list',
-          message: '🏛 Choose the code hosting platform',
+          message: '🏫 Choose the code hosting platform',
           name: 'hostingPlatform',
           choices: ['GitHub', 'GitLab'],
           when(allAnswers): boolean {
@@ -125,7 +125,7 @@ async function buildProject(): Promise<void> {
         },
         {
           type: 'input',
-          message: `🏛 Enter your GitHub or GitLab username`,
+          message: `🏫 Enter your GitHub or GitLab username`,
           name: 'platformUsername',
           when(allAnswers): boolean {
             return allAnswers.extraOptions.includes('git');
@@ -133,7 +133,7 @@ async function buildProject(): Promise<void> {
         },
         {
           type: 'input',
-          message: '🏛 Enter your repository name',
+          message: '🏫 Enter your repository name',
           name: 'repositoryName',
           when(allAnswers): boolean {
             return allAnswers.extraOptions.includes('git');
@@ -180,7 +180,7 @@ async function buildProject(): Promise<void> {
       answers.typeScript,
       answers.babel,
       answers.eslintConfig,
-      answers.extraSettings,
+      answers.extraLibs,
       answers.extraOptions,
       answers.tests,
       answers.licenseType,
@@ -204,11 +204,11 @@ async function buildProject(): Promise<void> {
       ProjectGenerator.handleProjectWithDefaultPreset(
         presetAnswers.presetChoice
       );
+    } else {
+      ProjectGenerator.handleProjectWithCustomPreset(
+        presetAnswers.presetChoice
+      );
     }
-
-    // else pick config created by user
-    // read cfg file and handleProjectSettings with settings from cfg
-    // ProjectGenerator.handleProjectWithCustomPreset
   }
 }
 

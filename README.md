@@ -25,10 +25,10 @@ Feel free to check issues page
 
 # ToDo
 - Add logger
-- Add Presets (create file like .forge-node-app-rc)
 - Add yargs (all questions but with args)
 - Re:Check Vue CLI and create-node-app(yargs) (good practices)
 - Extend JEST, Babel configs, tsconf
 - Fix ora with async (another spinners)
 - Add logo
 - Final code review and fixes (indentation, eslint rules in comments, and other things)
+- More libs (extra settings)
