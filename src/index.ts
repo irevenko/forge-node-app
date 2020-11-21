@@ -192,7 +192,6 @@ async function buildProject(): Promise<void> {
       answers.presetName
     );
   } else {
-    // eslint-disable-next-line no-lonely-if
     if (
       presetAnswers.presetChoice ===
         'Default (yarn, TypeScript, ESLint (Errors only), Jest)' ||

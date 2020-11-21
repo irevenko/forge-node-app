@@ -37,6 +37,7 @@ class PackageManager {
     ).start();
 
     fs.mkdirSync(projectName);
+
     if (pkgQuestions === 'Go with defaults') {
       execSync(`cd ${projectName} && ${pkgManager} init -y`, {
         stdio: 'ignore',
@@ -145,7 +146,7 @@ class PackageManager {
     platformUsername?: string,
     repositoryName?: string
   ): void {
-    const detailsSpinner = ora('📋 Adding Package Details...').start();
+    const detailsSpinner = ora('📋 Creating Package Details...').start();
 
     const pkgJSON: IPackage = JSON.parse(
       fs.readFileSync(`${projectName}/package.json`, 'utf8')
@@ -171,7 +172,7 @@ class PackageManager {
       JSON.stringify(pkgJSON, null, 2)
     );
 
-    detailsSpinner.succeed('📋 Added Package Details');
+    detailsSpinner.succeed('📋 Created Package Details');
   }
 
   static installTsDependencies(pkgManager: string, projectName: string): void {
@@ -243,7 +244,6 @@ class PackageManager {
         });
       }
     }
-    // eslint-disable-next-line default-case
     switch (eslintConfig) {
       case 'Only Errors':
         if (typeScript && prettier) {

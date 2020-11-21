@@ -5,7 +5,6 @@ import esAirBnbBabelPretty from './eslint_airbnb_prettier_babel';
 import esAirBnbJsPretty from './eslint_airbnb_prettier_js';
 import esAirBnbTsPretty from './eslint_airbnb_prettier_ts';
 
-// eslint-disable-next-line import/prefer-default-export
 export const airBnb = {
   js: esAirBnbJs,
   ts: esAirBnbTs,

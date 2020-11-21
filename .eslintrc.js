@@ -12,7 +12,6 @@ module.exports = {
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
-    // 'plugin:node/recommended',
   ],
   plugins: ['prettier', '@typescript-eslint'],
   parserOptions: {
@@ -27,5 +26,8 @@ module.exports = {
     'import/extensions': 0,
     'prefer-default-export': 0,
     '@typescript-eslint/no-non-null-assertion': 0,
+    'default-case': 0,
+    'import/prefer-default-export': 0,
+    'no-lonely-if': 0
   },
 };

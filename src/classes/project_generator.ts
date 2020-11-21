@@ -71,7 +71,7 @@ class ProjectGenerator {
       projectName,
       licenseType!,
       licenseAuthor!,
-      extraOptions?.includes('git'),
+      extraOptions!.includes('git'),
       hostingPlatform,
       platformUsername,
       repositoryName
@@ -144,7 +144,7 @@ class ProjectGenerator {
       chalk.greenBright(`🚀 cd ${projectName} && ${pkgManager} start`)
     );
 
-    if (extraOptions?.includes('git')) {
+    if (extraOptions!.includes('git')) {
       console.log(chalk.redBright('Dont forget to create repo at:'));
       console.log(
         chalk.cyanBright(
@@ -199,7 +199,6 @@ class ProjectGenerator {
 
     fs.mkdirSync(`${projectName}/__tests__`, { recursive: true });
 
-    // eslint-disable-next-line default-case
     switch (testingFramework) {
       case 'Jest':
         if (typeScript) {
@@ -253,7 +252,6 @@ class ProjectGenerator {
 
     execSync(`cd ${projectName} && git init`, { stdio: 'ignore' });
 
-    // eslint-disable-next-line default-case
     switch (hostingPlatform) {
       case 'GitHub':
         execSync(
@@ -289,7 +287,6 @@ class ProjectGenerator {
   ): void {
     const licenseSpinner = ora('📜 Creating License...').start();
 
-    // eslint-disable-next-line default-case
     switch (licenseType) {
       case 'MIT':
         fs.writeFileSync(
@@ -432,7 +429,6 @@ class ProjectGenerator {
   }
 
   static handleProjectWithDefaultPreset(presetName: string): void {
-    // eslint-disable-next-line default-case
     switch (presetName) {
       case 'Default (yarn, TypeScript, ESLint (Errors only), Jest)':
         ProjectGenerator.handleProjectSettings(

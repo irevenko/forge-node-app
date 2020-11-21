@@ -1,6 +1,6 @@
-# Forge Node App 🛠📦🎊
-<p align="center"><img src="https://www.pngitem.com/pimgs/m/18-182566_blacksmith-anvil-hammer-work-forge-metal-iron-anvil.png" width=250></p> 
-<p align="center">A Fast Way to Generate Node Boilerplate With Your Favorite Development Tools and Libs </p>
+# forge-node-app 🛠📦🎊
+<p align="center"><img src="https://i.imgur.com/NcP5ATW.png" width=350></p> 
+<p align="center">A Fast Way to Generate Node.js Boilerplate With Your Favorite Development Tools and Libs </p>
 <h3 align="center">💖 Inspired by <a href="https://github.com/vuejs/vue-cli">vue-cli</a></h3>
 
 # Usage 🛴
@@ -9,6 +9,9 @@ RUN <br>
 OR INSTALL GLOBALLY <br>
 ```npm i -g forge-node-app``` <br>
 ```forge-node-app```
+
+# Preview 🔍
+<img src="https://i.imgur.com/y8hdTau.gif" width="540">
 
 # Supported Things 📄 
 - VanillaJS, TypeScript, Babel
@@ -30,8 +33,6 @@ Contributions, issues and feature requests are welcome! <br>
 Feel free to check issues page
 
 # ToDo 🧾
-- Fix ora with async (another spinners)
-- Final code review and fixes (indentation, eslint rules in comments, and other things)
 - More libs (JSDoc, Process Managers, Loggers)
 - Add yargs
 

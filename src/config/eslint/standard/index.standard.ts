@@ -5,7 +5,6 @@ import esStandardBabelPretty from './eslint_standard_prettier_babel';
 import esStandardJsPretty from './eslint_standard_prettier_js';
 import esStandardTsPretty from './eslint_standard_prettier_ts';
 
-// eslint-disable-next-line import/prefer-default-export
 export const standard = {
   js: esStandardJs,
   ts: esStandardTs,

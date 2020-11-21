@@ -1,8 +1,8 @@
 {
   "name": "forge-node-app",
   "version": "1.0.0",
-  "description": "A Fast Way To Generate Node.js App",
-  "main": "index.js",
+  "description": "A fast way to generate Node.js starter app",
+  "main": "out/index.js",
   "scripts": {
     "start": "node out/index.js",
     "dev": "ts-node src/index.ts",
@@ -15,7 +15,9 @@
   },
   "keywords": [
     "typescript",
-    "nodejs"
+    "nodejs",
+    "boilerplate",
+    "cli"
   ],
   "author": "Ilya Revenko <ilya.revenko17@gmail.com>",
   "license": "MIT",
