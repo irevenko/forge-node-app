@@ -4,9 +4,12 @@
 <h3 align="center">💖 Inspired by <a href="https://github.com/vuejs/vue-cli">vue-cli</a></h3>
 
 # Usage 🛴
-RUN <br>
-```npx forge-node-app``` <br>
-OR INSTALL GLOBALLY <br>
+<h2>Run</h2>
+
+```npx forge-node-app```
+
+<h2>Or install globally</h2>
+
 ```npm i -g forge-node-app``` <br>
 ```forge-node-app```
 
@@ -32,9 +35,31 @@ OR INSTALL GLOBALLY <br>
 Contributions, issues and feature requests are welcome! <br>
 Feel free to check issues page
 
+# Quick start 🚀
+Clone the repo <br>
+```npm install``` <br>
+```npm run build && npm start```
+
+# Tech stack 📜
+- TypeScript + ESLint(AirBNB) + Prettier
+- <a href="https://npmjs.com/inquirer">Inquirer</a> for the interface
+- <a href="https://npmjs.com/chalk">chalk</a> for terminal colors
+- <a href="https://npmjs.com/ora">ora</a> for cli spinners
+- <a href="https://npmjs.com/license">license</a> for LICENSE generation
+
 # ToDo 🧾
 - More libs (JSDoc, Process Managers, Loggers)
 - Add yargs
+
+# What i Learned 🧠
+- Building CLI with Inquirer, ora, chalk
+- TypeScript & Babel basics
+- How to setup Modern Node.js Project
+- ESLint, Prettier, tsconf structures
+- How npm and yarn work
+- Setting up simple Unit tests with Jest, Mocha + Chai
+- Writing package manager scripts
+- Publishing npm package
 
 # License 📑 
 (c) 2020 Ilya Revenko. [MIT License](https://tldrlegal.com/license/mit-license)

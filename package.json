@@ -1,30 +1,33 @@
 {
   "name": "forge-node-app",
-  "version": "1.0.0",
+  "version": "1.0.6",
   "description": "A fast way to generate Node.js starter app",
   "main": "out/index.js",
+  "bin": "out/index.js",
   "scripts": {
+    "build": "npx tsc",
     "start": "node out/index.js",
-    "dev": "ts-node src/index.ts",
-    "format": "prettier src/**/*.ts --write",
-    "linter:fix": "eslint src/*.ts --fix"
+    "dev": "npx ts-node src/index.ts",
+    "format": "npx prettier src/**/*.ts --write",
+    "linter:fix": "npx eslint src/*.ts --fix"
   },
+  "author": "Ilya Revenko <ilya.revenko17@gmail.com>",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/irevenko/forge-node-app.git"
   },
-  "keywords": [
-    "typescript",
-    "nodejs",
-    "boilerplate",
-    "cli"
-  ],
-  "author": "Ilya Revenko <ilya.revenko17@gmail.com>",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/irevenko/forge-node-app/issues"
   },
   "homepage": "https://github.com/irevenko/forge-node-app#readme",
+  "keywords": [
+    "typescript",
+    "nodejs",
+    "boilerplate",
+    "cli",
+    "create-node-app"
+  ],
   "devDependencies": {
     "@tsconfig/node14": "^1.0.0",
     "@types/inquirer": "^7.3.1",
