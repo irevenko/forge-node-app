@@ -1,21 +1,18 @@
-import * as BasePackageManager from './base';
+import BasePackageManager from './base';
 
-import * as NPM from './npm';
-import * as YARN from './yarn';
+import { PackageManagerType } from './package_manager_type';
+import NPM from './npm';
+import YARN from './yarn';
 
-
-export enum PackageManagerType {
-    NPM = '';
-    YARN = '';
-}
-
-export const factory = (packageManagerType: PackageManagerType): typeof BasePackageManager  => {
-    switch (packageManagerType) {
-        case PackageManagerType.NPM:
-            return NPM;
-        case PackageManagerType.YARN:
-            return YARN;
-    }
+export const factory = (
+  packageManagerType: PackageManagerType | string
+): BasePackageManager => {
+  switch (packageManagerType) {
+    case 'npm':
+      return NPM;
+    case 'yarn':
+      return YARN;
+    default:
+      throw new Error(`Invalid package manager type ${packageManagerType}`);
+  }
 };
-
-export BasePackageManager;

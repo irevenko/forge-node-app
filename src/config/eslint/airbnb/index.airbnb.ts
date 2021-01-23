@@ -4,8 +4,9 @@ import esAirBnbTs from './eslint_airbnb_ts';
 import esAirBnbBabelPretty from './eslint_airbnb_prettier_babel';
 import esAirBnbJsPretty from './eslint_airbnb_prettier_js';
 import esAirBnbTsPretty from './eslint_airbnb_prettier_ts';
+import { ESLintSpecificConfig } from '../index.eslint';
 
-export const airBnb = {
+export const airBnb: ESLintSpecificConfig = {
   js: esAirBnbJs,
   ts: esAirBnbTs,
   babel: esAirBnbBabel,

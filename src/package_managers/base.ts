@@ -1,10 +1,10 @@
 import { StdioOptions } from 'child_process';
+import { PackageManagerType } from './package_manager_type';
 
 export enum PackageInstallationType {
-  DEPENDENCIES = '',
-  DEV_DEPENDENCIES = '',
-  OPTIONAL = '',
-  BUNDLED = '',
+  DEPENDENCIES,
+  DEV_DEPENDENCIES,
+  OPTIONAL,
 }
 
 export type PackageManagerInit = ({
@@ -15,7 +15,7 @@ export type PackageManagerInit = ({
   cwd: string;
   interactive: boolean;
   stdio: StdioOptions;
-}) => Promise<void>;
+}) => Buffer;
 
 export type PackageManagerInstall = ({
   cwd,
@@ -24,7 +24,13 @@ export type PackageManagerInstall = ({
   stdio,
 }: {
   cwd: string;
-  packageName: boolean;
+  packageName: string;
   type: PackageInstallationType;
   stdio: StdioOptions;
-}) => Promise<void>;
+}) => Buffer;
+
+export default interface IPackageManager {
+  type: PackageManagerType;
+  init: PackageManagerInit;
+  install: PackageManagerInstall;
+}

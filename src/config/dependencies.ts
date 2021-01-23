@@ -1,4 +1,4 @@
-export const tsDependencies = 'typescript ts-node @types/node -D';
+export const tsDependencies = 'typescript ts-node @types/node';
 
 export const eslintDependencies =
   'eslint eslint-config-node eslint-plugin-node';

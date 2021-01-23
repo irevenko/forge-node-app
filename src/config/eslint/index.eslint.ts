@@ -8,7 +8,20 @@ import { airBnb } from './airbnb/index.airbnb';
 import { google } from './google/index.google';
 import { standard } from './standard/index.standard';
 
-const esLint = {
+export interface ESLintSpecificConfig {
+  js: unknown;
+  ts: unknown;
+  babel: unknown;
+  tsPretty: unknown;
+  jsPretty: unknown;
+  babelPretty: unknown;
+}
+
+const esLint: ESLintSpecificConfig & {
+  airBnb: ESLintSpecificConfig;
+  google: ESLintSpecificConfig;
+  standard: ESLintSpecificConfig;
+} = {
   airBnb,
   google,
   standard,

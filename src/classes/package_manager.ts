@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import fs from 'fs';
 import ora from 'ora';
+import path from 'path';
 import { execSync } from 'child_process';
 import { IPackage } from '../interfaces';
 import {
@@ -9,42 +10,43 @@ import {
   babelLinterDependencies,
   eslintDependencies,
   eslintTsDependencies,
-  lintFormatDependencies,
-  tsDependencies,
   lintAirBnbDependencies,
+  lintFormatDependencies,
   lintGoogleDependencies,
   lintStandardDependencies,
+  tsDependencies,
 } from '../config/dependencies';
 import {
-  eslintIgnore,
-  prettierIgnore,
-  dotenvCommonFile,
-  dotenvFile,
-  dotenvESFile,
-  prettierConfig,
   babelConfig,
+  dotenvCommonFile,
+  dotenvESFile,
+  dotenvFile,
+  eslintIgnore,
+  prettierConfig,
+  prettierIgnore,
 } from '../config/misc';
-import esLint from '../config/eslint/index.eslint';
+import esLint, { ESLintSpecificConfig } from '../config/eslint/index.eslint';
+import { IPackageManager } from '../package_managers';
+import { PackageInstallationType } from '../package_managers/base';
 
 class PackageManager {
   static initPackage(
     projectName: string,
-    pkgManager: string,
+    pkgManager: IPackageManager,
     pkgQuestions: string
   ): void {
     const packageSpinner = ora(
-      `🔨 Initializing The Package with ${pkgManager}...`
+      `🔨 Initializing The Package with ${pkgManager.type}...`
     ).start();
 
     fs.mkdirSync(projectName);
 
-    if (pkgQuestions === 'Go with defaults') {
-      execSync(`cd ${projectName} && ${pkgManager} init -y`, {
-        stdio: 'ignore',
-      });
-    } else {
-      execSync(`cd ${projectName} && ${pkgManager} init`, { stdio: 'inherit' });
-    }
+    const goWithDefault = pkgQuestions !== 'Go with defaults';
+    pkgManager.init({
+      cwd: path.join(process.cwd(), projectName),
+      interactive: goWithDefault,
+      stdio: goWithDefault ? 'ignore' : 'inherit',
+    });
 
     packageSpinner.succeed(`🔨 Initialized The Package with ${pkgManager}`);
   }
@@ -175,45 +177,78 @@ class PackageManager {
     detailsSpinner.succeed('📋 Created Package Details');
   }
 
-  static installTsDependencies(pkgManager: string, projectName: string): void {
+  static installTsDependencies(
+    pkgManager: IPackageManager,
+    projectName: string
+  ): void {
     const tsSpinner = ora('📥 Setting Up TypeScript...').start();
 
-    if (pkgManager === 'npm') {
-      execSync(`cd ${projectName} && npm i ${tsDependencies}`, {
-        stdio: 'ignore',
-      });
-    }
-    if (pkgManager === 'yarn') {
-      execSync(`cd ${projectName} && yarn add ${tsDependencies}`, {
-        stdio: 'ignore',
-      });
-    }
+    pkgManager.install({
+      cwd: path.join(process.cwd(), projectName),
+      type: PackageInstallationType.DEV_DEPENDENCIES,
+      stdio: 'ignore',
+      packageName: tsDependencies,
+    });
 
     tsSpinner.succeed('📥 Set Up TypeScript');
   }
 
-  static addBabel(projectName: string, pkgManager: string): void {
+  static addBabel(projectName: string, pkgManager: IPackageManager): void {
     const babelSpinner = ora('🐠 Adding Babel...').start();
 
-    if (pkgManager === 'npm') {
-      execSync(`cd ${projectName} && npm i ${babelDependencies} -D`, {
-        stdio: 'ignore',
-      });
-    }
-    if (pkgManager === 'yarn') {
-      execSync(`cd ${projectName} && yarn add ${babelDependencies} -D`, {
-        stdio: 'ignore',
-      });
-    }
+    pkgManager.install({
+      cwd: path.join(process.cwd(), projectName),
+      type: PackageInstallationType.DEV_DEPENDENCIES,
+      stdio: 'ignore',
+      packageName: babelDependencies,
+    });
 
     fs.writeFileSync(`${projectName}/.babelrc`, babelConfig);
 
     babelSpinner.succeed('🐠 Added Babel');
   }
 
+  private static addEslintSpecificConfig(
+    projectName: string,
+    pkgManager: IPackageManager,
+    dependencies: string | undefined,
+    eslintStyle: ESLintSpecificConfig,
+    typeScript: boolean,
+    babel: boolean,
+    prettier: boolean
+  ): void {
+    let eslintJsonConfig;
+    if (typeScript && prettier) {
+      eslintJsonConfig = eslintStyle.tsPretty;
+    } else if (typeScript) {
+      eslintJsonConfig = eslintStyle.ts;
+    } else if (babel && prettier) {
+      eslintJsonConfig = eslintStyle.babelPretty;
+    } else if (babel) {
+      eslintJsonConfig = eslintStyle.babel;
+    } else if (prettier) {
+      eslintJsonConfig = eslintStyle.jsPretty;
+    } else {
+      eslintJsonConfig = eslintStyle.js;
+    }
+
+    fs.writeFileSync(
+      `${projectName}/.eslintrc.json`,
+      JSON.stringify(eslintJsonConfig, null, 2)
+    );
+    if (dependencies) {
+      pkgManager.install({
+        cwd: path.join(process.cwd(), projectName),
+        type: PackageInstallationType.DEV_DEPENDENCIES,
+        stdio: 'ignore',
+        packageName: dependencies,
+      });
+    }
+  }
+
   static addEslint(
     projectName: string,
-    pkgManager: string,
+    pkgManager: IPackageManager,
     eslintConfig: string,
     typeScript: boolean,
     babel: boolean,
@@ -223,284 +258,117 @@ class PackageManager {
 
     fs.writeFileSync(`${projectName}/.eslintignore`, eslintIgnore);
 
-    if (pkgManager === 'npm') {
-      execSync(`cd ${projectName} && npm i ${eslintDependencies} -D`, {
-        stdio: 'ignore',
-      });
-      if (typeScript) {
-        execSync(`cd ${projectName} && npm i ${eslintTsDependencies} -D`, {
-          stdio: 'ignore',
-        });
-      }
-    }
+    pkgManager.install({
+      cwd: path.join(process.cwd(), projectName),
+      type: PackageInstallationType.DEV_DEPENDENCIES,
+      stdio: 'ignore',
+      packageName: `${eslintDependencies}${
+        typeScript ? ` ${eslintTsDependencies}` : ''
+      }`,
+    });
 
-    if (pkgManager === 'yarn') {
-      execSync(`cd ${projectName} && yarn add ${eslintDependencies} -D`, {
-        stdio: 'ignore',
-      });
-      if (typeScript) {
-        execSync(`cd ${projectName} && yarn add ${eslintTsDependencies} -D`, {
-          stdio: 'ignore',
-        });
-      }
-    }
+    let eslintSpecificConfig: ESLintSpecificConfig | undefined;
+    let eslintSpecificDependencies: string | undefined;
+
     switch (eslintConfig) {
       case 'Only Errors':
-        if (typeScript && prettier) {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.tsPretty, null, 2)
-          );
-        } else if (typeScript) {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.ts, null, 2)
-          );
-        } else if (babel && prettier) {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.babelPretty, null, 2)
-          );
-        } else if (babel) {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.babel, null, 2)
-          );
-        } else if (prettier) {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.jsPretty, null, 2)
-          );
-        } else {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.js, null, 2)
-          );
-        }
+        eslintSpecificConfig = esLint;
         break;
       case 'AirBNB':
-        if (typeScript && prettier) {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.airBnb.tsPretty, null, 2)
-          );
-        } else if (typeScript) {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.airBnb.ts, null, 2)
-          );
-        } else if (babel && prettier) {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.airBnb.babelPretty, null, 2)
-          );
-        } else if (babel) {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.airBnb.babel, null, 2)
-          );
-        } else if (prettier) {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.airBnb.jsPretty, null, 2)
-          );
-        } else {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.airBnb.js, null, 2)
-          );
-        }
-        if (pkgManager === 'npm') {
-          execSync(`cd ${projectName} && npm i ${lintAirBnbDependencies} -D`, {
-            stdio: 'ignore',
-          });
-        }
-        if (pkgManager === 'yarn') {
-          execSync(
-            `cd ${projectName} && yarn add ${lintAirBnbDependencies} -D`,
-            {
-              stdio: 'ignore',
-            }
-          );
-        }
+        eslintSpecificConfig = esLint.airBnb;
+        eslintSpecificDependencies = lintAirBnbDependencies;
         break;
       case 'Google':
-        if (typeScript && prettier) {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.google.tsPretty, null, 2)
-          );
-        } else if (typeScript) {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.google.ts, null, 2)
-          );
-        } else if (babel && prettier) {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.google.babelPretty, null, 2)
-          );
-        } else if (babel) {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.google.babel, null, 2)
-          );
-        } else if (prettier) {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.google.jsPretty, null, 2)
-          );
-        } else {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.google.js, null, 2)
-          );
-        }
-        if (pkgManager === 'npm') {
-          execSync(`cd ${projectName} && npm i ${lintGoogleDependencies} -D`, {
-            stdio: 'ignore',
-          });
-        }
-        if (pkgManager === 'yarn') {
-          execSync(
-            `cd ${projectName} && yarn add ${lintGoogleDependencies} -D`,
-            {
-              stdio: 'ignore',
-            }
-          );
-        }
+        eslintSpecificConfig = esLint.google;
+        eslintSpecificDependencies = lintGoogleDependencies;
         break;
       case 'Standard':
-        if (typeScript && prettier) {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.standard.tsPretty, null, 2)
-          );
-        } else if (typeScript) {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.standard.ts, null, 2)
-          );
-        } else if (babel && prettier) {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.standard.babelPretty, null, 2)
-          );
-        } else if (babel) {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.standard.babel, null, 2)
-          );
-        } else if (prettier) {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.standard.jsPretty, null, 2)
-          );
-        } else {
-          fs.writeFileSync(
-            `${projectName}/.eslintrc.json`,
-            JSON.stringify(esLint.standard.js, null, 2)
-          );
-        }
-        if (pkgManager === 'npm') {
-          execSync(
-            `cd ${projectName} && npm i ${lintStandardDependencies} -D`,
-            {
-              stdio: 'ignore',
-            }
-          );
-        }
-        if (pkgManager === 'yarn') {
-          execSync(
-            `cd ${projectName} && yarn add ${lintStandardDependencies} -D`,
-            {
-              stdio: 'ignore',
-            }
-          );
-        }
+        eslintSpecificConfig = esLint.standard;
+        eslintSpecificDependencies = lintStandardDependencies;
         break;
+    }
+
+    if (eslintSpecificConfig) {
+      PackageManager.addEslintSpecificConfig(
+        projectName,
+        pkgManager,
+        eslintSpecificDependencies,
+        eslintSpecificConfig,
+        typeScript,
+        babel,
+        prettier
+      );
     }
 
     linterSpinner.succeed('🔎 Added ESLint');
   }
 
-  static addPrettier(projectName: string, pkgManager: string): void {
+  static addPrettier(projectName: string, pkgManager: IPackageManager): void {
     const prettierSpinner = ora('🧹 Adding Prettier...').start();
 
     fs.writeFileSync(`${projectName}/.prettierignore`, prettierIgnore);
     fs.writeFileSync(`${projectName}/.prettierrc`, prettierConfig);
 
-    if (pkgManager === 'npm') {
-      execSync(`cd ${projectName} && npm i prettier -D`, { stdio: 'ignore' });
-    }
-    if (pkgManager === 'yarn') {
-      execSync(`cd ${projectName} && yarn add prettier -D`, {
-        stdio: 'ignore',
-      });
-    }
+    pkgManager.install({
+      cwd: path.join(process.cwd(), projectName),
+      type: PackageInstallationType.DEV_DEPENDENCIES,
+      stdio: 'ignore',
+      packageName: 'prettier',
+    });
 
     prettierSpinner.succeed('🧹 Added Prettier');
   }
 
   static attachLinterWithPrettier(
     projectName: string,
-    pkgManager: string
+    pkgManager: IPackageManager
   ): void {
     const linterPrettierSpinner = ora(
       '🖇 Connecting ESLint with Prettier...'
     ).start();
 
-    if (pkgManager === 'npm') {
-      execSync(`cd ${projectName} && npm i ${lintFormatDependencies} -D`, {
-        stdio: 'ignore',
-      });
-    }
-    if (pkgManager === 'yarn') {
-      execSync(`cd ${projectName} && yarn add ${lintFormatDependencies} -D`, {
-        stdio: 'ignore',
-      });
-    }
+    pkgManager.install({
+      cwd: path.join(process.cwd(), projectName),
+      type: PackageInstallationType.DEV_DEPENDENCIES,
+      stdio: 'ignore',
+      packageName: lintFormatDependencies,
+    });
 
     linterPrettierSpinner.succeed('🖇 Connected ESLint with Prettier');
   }
 
-  static attachLinterWithBabel(projectName: string, pkgManager: string): void {
+  static attachLinterWithBabel(
+    projectName: string,
+    pkgManager: IPackageManager
+  ): void {
     const linterPrettierSpinner = ora(
       '🖇 Connecting ESLint with Babel...'
     ).start();
 
-    if (pkgManager === 'npm') {
-      execSync(`cd ${projectName} && npm i ${babelLinterDependencies} -D`, {
-        stdio: 'ignore',
-      });
-    }
-    if (pkgManager === 'yarn') {
-      execSync(`cd ${projectName} && yarn add ${babelLinterDependencies} -D`, {
-        stdio: 'ignore',
-      });
-    }
+    pkgManager.install({
+      cwd: path.join(process.cwd(), projectName),
+      type: PackageInstallationType.DEV_DEPENDENCIES,
+      stdio: 'ignore',
+      packageName: babelLinterDependencies,
+    });
 
     linterPrettierSpinner.succeed('🖇 Connected ESLint with Babel');
   }
 
   static addDotenv(
     projectName: string,
-    pkgManager: string,
+    pkgManager: IPackageManager,
     typeScript: boolean,
     babel: boolean
   ): void {
     const dotenvSpinner = ora('🔒 Adding Dotenv...').start();
 
-    if (pkgManager === 'npm') {
-      execSync(`cd ${projectName} && npm i dotenv -D`, {
-        stdio: 'ignore',
-      });
-    }
-    if (pkgManager === 'yarn') {
-      execSync(`cd ${projectName} && yarn add dotenv -D`, {
-        stdio: 'ignore',
-      });
-    }
+    pkgManager.install({
+      cwd: path.join(process.cwd(), projectName),
+      type: PackageInstallationType.DEV_DEPENDENCIES,
+      stdio: 'ignore',
+      packageName: 'dotenv',
+    });
 
     fs.writeFileSync(`${projectName}/.env`, dotenvFile);
 
@@ -517,72 +385,37 @@ class PackageManager {
 
   static addChangesMonitor(
     projectName: string,
-    pkgManager: string,
+    pkgManager: IPackageManager,
     typeScript: boolean
   ): void {
     const nodemonSpinner = ora('🔁 Adding Changes Montitor...').start();
 
-    if (pkgManager === 'npm') {
-      typeScript
-        ? execSync(`cd ${projectName} && npm i ts-node-dev -D`, {
-            stdio: 'ignore',
-          })
-        : execSync(`cd ${projectName} && npm i nodemon -D`, {
-            stdio: 'ignore',
-          });
-    }
-
-    if (pkgManager === 'yarn') {
-      typeScript
-        ? execSync(`cd ${projectName} && yarn add ts-node-dev -D`, {
-            stdio: 'ignore',
-          })
-        : execSync(`cd ${projectName} && yarn add nodemon -D`, {
-            stdio: 'ignore',
-          });
-    }
+    pkgManager.install({
+      cwd: path.join(process.cwd(), projectName),
+      type: PackageInstallationType.DEV_DEPENDENCIES,
+      stdio: 'ignore',
+      packageName: typeScript ? 'ts-node-dev' : 'nodemon',
+    });
 
     nodemonSpinner.succeed('🔁 Added Changes Monitor');
   }
 
   static addJest(
     projectName: string,
-    pkgManager: string,
+    pkgManager: IPackageManager,
     typeScript: boolean,
     babel: boolean
   ): void {
     const jestSpinner = ora('🃏 Adding Jest...').start();
 
-    if (pkgManager === 'npm') {
-      typeScript
-        ? execSync(`cd ${projectName} && npm i jest @types/jest ts-jest -D`, {
-            stdio: 'ignore',
-          })
-        : execSync(`cd ${projectName} && npm i jest -D`, {
-            stdio: 'ignore',
-          });
-      if (babel) {
-        execSync(`cd ${projectName} && npm i jest-babel -D`, {
-          stdio: 'ignore',
-        });
-      }
-    }
-
-    if (pkgManager === 'yarn') {
-      typeScript
-        ? execSync(
-            `cd ${projectName} && yarn add jest @types/jest ts-jest -D`,
-            { stdio: 'ignore' }
-          )
-        : execSync(`cd ${projectName} && yarn add jest -D`, {
-            stdio: 'ignore',
-          });
-      if (babel) {
-        execSync(`cd ${projectName} && yarn add jest-babel -D`, {
-          stdio: 'ignore',
-        });
-      }
-    }
+    pkgManager.install({
+      cwd: path.join(process.cwd(), projectName),
+      type: PackageInstallationType.DEV_DEPENDENCIES,
+      stdio: 'ignore',
+      packageName: `jest${typeScript ? ' @types/jest ts-jest' : ''}${
+        babel ? ' jest-babel' : ''
+      }`,
+    });
 
     if (typeScript) {
       execSync(`cd ${projectName} && npx ts-jest config:init`, {
@@ -599,53 +432,20 @@ class PackageManager {
 
   static addMochaChai(
     projectName: string,
-    pkgManager: string,
+    pkgManager: IPackageManager,
     typeScript: boolean,
     babel: boolean
   ): void {
     const mochaChaiSpinner = ora('🍵 Adding Mocha & Chai...').start();
 
-    if (pkgManager === 'npm') {
-      typeScript
-        ? execSync(
-            `cd ${projectName} && npm i mocha chai @types/mocha @types/chai -D`,
-            {
-              stdio: 'ignore',
-            }
-          )
-        : execSync(`cd ${projectName} && npm i mocha chai -D`, {
-            stdio: 'ignore',
-          });
-      if (babel) {
-        execSync(
-          `cd ${projectName} && npm i @babel/register @babel/polyfill -D`,
-          {
-            stdio: 'ignore',
-          }
-        );
-      }
-    }
-
-    if (pkgManager === 'yarn') {
-      typeScript
-        ? execSync(
-            `cd ${projectName} && yarn add mocha chai @types/mocha @types/chai -D`,
-            {
-              stdio: 'ignore',
-            }
-          )
-        : execSync(`cd ${projectName} && yarn add mocha chai -D`, {
-            stdio: 'ignore',
-          });
-      if (babel) {
-        execSync(
-          `cd ${projectName} && yarn add @babel/register @babel/polyfill -D`,
-          {
-            stdio: 'ignore',
-          }
-        );
-      }
-    }
+    pkgManager.install({
+      cwd: path.join(process.cwd(), projectName),
+      type: PackageInstallationType.DEV_DEPENDENCIES,
+      stdio: 'ignore',
+      packageName: `jest mocha chai${
+        typeScript ? ' @types/mocha @types/chai' : ''
+      }${babel ? ' @babel/register @babel/polyfill' : ''}`,
+    });
 
     mochaChaiSpinner.succeed('🍵 Added Mocha & Chai');
   }

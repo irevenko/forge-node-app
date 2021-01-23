@@ -6,6 +6,7 @@ import chalk from 'chalk';
 import { getLicense } from 'license';
 import { execSync } from 'child_process';
 import PackageManager from './package_manager';
+import { IPackageManager, factory } from '../package_managers';
 import {
   mochaChaiCommonFile,
   mochaChaiESFile,
@@ -22,7 +23,7 @@ import { IPreset, IAnswers } from '../interfaces';
 class ProjectGenerator {
   static handleProjectSettings(
     projectName: string,
-    pkgManager: string,
+    pkgManagerName: string,
     pkgQuestions: string,
     typeScript: boolean,
     babel: boolean,
@@ -38,15 +39,16 @@ class ProjectGenerator {
     savePreset?: boolean,
     presetName?: string
   ): void {
-    PackageManager.initPackage(projectName, pkgManager, pkgQuestions);
+    const packageManager: IPackageManager = factory(pkgManagerName);
+    PackageManager.initPackage(projectName, packageManager, pkgQuestions);
 
     if (typeScript) {
-      PackageManager.installTsDependencies(pkgManager, projectName);
+      PackageManager.installTsDependencies(packageManager, projectName);
       ProjectGenerator.initTypeScript(projectName);
     }
 
     if (babel) {
-      PackageManager.addBabel(projectName, pkgManager);
+      PackageManager.addBabel(projectName, packageManager);
     }
 
     if (extraOptions) {
@@ -86,27 +88,32 @@ class ProjectGenerator {
 
     if (tests === 'Jest') {
       ProjectGenerator.createTestsFolder(projectName, typeScript, babel, tests);
-      PackageManager.addJest(projectName, pkgManager, typeScript, babel);
+      PackageManager.addJest(projectName, packageManager, typeScript, babel);
     }
 
     if (tests === 'Mocha + Chai') {
       ProjectGenerator.createTestsFolder(projectName, typeScript, babel, tests);
-      PackageManager.addMochaChai(projectName, pkgManager, typeScript, babel);
+      PackageManager.addMochaChai(
+        projectName,
+        packageManager,
+        typeScript,
+        babel
+      );
     }
 
     if (extraLibs!.includes('Prettier')) {
-      PackageManager.addPrettier(projectName, pkgManager);
+      PackageManager.addPrettier(projectName, packageManager);
     }
     if (extraLibs!.includes('ESLint') && extraLibs!.includes('Prettier')) {
-      PackageManager.attachLinterWithPrettier(projectName, pkgManager);
+      PackageManager.attachLinterWithPrettier(projectName, packageManager);
     }
     if (extraLibs!.includes('ESLint') && babel) {
-      PackageManager.attachLinterWithBabel(projectName, pkgManager);
+      PackageManager.attachLinterWithBabel(projectName, packageManager);
     }
     if (extraLibs!.includes('ESLint')) {
       PackageManager.addEslint(
         projectName,
-        pkgManager,
+        packageManager,
         eslintConfig!,
         typeScript,
         babel,
@@ -114,16 +121,16 @@ class ProjectGenerator {
       );
     }
     if (extraLibs!.includes('dotenv')) {
-      PackageManager.addDotenv(projectName, pkgManager, typeScript, babel);
+      PackageManager.addDotenv(projectName, packageManager, typeScript, babel);
     }
     if (extraLibs!.includes('nodemon or ts-node-dev')) {
-      PackageManager.addChangesMonitor(projectName, pkgManager, typeScript);
+      PackageManager.addChangesMonitor(projectName, packageManager, typeScript);
     }
 
     if (savePreset) {
       ProjectGenerator.savePreset(presetName!, {
         projectName,
-        pkgManager,
+        pkgManager: pkgManagerName,
         pkgQuestions,
         typeScript,
         babel,
@@ -141,7 +148,7 @@ class ProjectGenerator {
 
     console.log(chalk.greenBright('🎉 Ready!'));
     console.log(
-      chalk.greenBright(`🚀 cd ${projectName} && ${pkgManager} start`)
+      chalk.greenBright(`🚀 cd ${projectName} && ${packageManager.type} start`)
     );
 
     if (extraOptions!.includes('git')) {

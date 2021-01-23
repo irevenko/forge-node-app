@@ -1,5 +1,5 @@
-import { exec } from 'child_process';
-import {
+import { execSync } from 'child_process';
+import BasePackageManager, {
   PackageInstallationType,
   PackageManagerInit,
   PackageManagerInstall,
@@ -9,14 +9,8 @@ export const init: PackageManagerInit = ({
   cwd,
   interactive,
   stdio,
-}): Promise<void> => {
-  return new Promise<void>((resolve, reject) =>
-    exec(
-      `npm init${interactive ? ' -y' : ''}`,
-      { stdio, cwd },
-      (err, stdout, stderr) => (err ? reject(err) : resolve())
-    )
-  );
+}): Buffer => {
+  return execSync(`npm init${interactive ? '' : ' -y'}`, { stdio, cwd });
 };
 
 export const install: PackageManagerInstall = ({
@@ -24,26 +18,26 @@ export const install: PackageManagerInstall = ({
   packageName,
   type,
   stdio,
-}): Promise<void> => {
-  return new Promise<void>((resolve, reject) => {
-    let installOption = '';
-    switch (type) {
-      case PackageInstallationType.DEV_DEPENDENCIES:
-        installOption = '-D';
-        break;
-      case PackageInstallationType.OPTIONAL:
-        installOption = '-O';
-        break;
-      case PackageInstallationType.BUNDLED:
-        installOption = '-B';
-        break;
-      default:
-        break;
-    }
-    exec(
-      `npm install ${packageName}${installOption ? ` ${installOption}` : ''}`,
-      { stdio, cwd },
-      (err, stdout, stderr) => (err ? reject(err) : resolve())
-    );
-  });
+}): Buffer => {
+  let installOption = '';
+  switch (type) {
+    case PackageInstallationType.DEV_DEPENDENCIES:
+      installOption = '-D';
+      break;
+    case PackageInstallationType.OPTIONAL:
+      installOption = '-O';
+      break;
+    default:
+      break;
+  }
+  return execSync(
+    `npm install ${packageName}${installOption ? ` ${installOption}` : ''}`,
+    { stdio, cwd }
+  );
 };
+
+export default {
+  type: 'npm',
+  init,
+  install,
+} as BasePackageManager;

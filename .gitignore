@@ -1,3 +1,6 @@
+# Editor specific
+.idea
+
 # Logs
 logs
 *.log
