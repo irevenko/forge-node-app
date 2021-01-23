@@ -48,7 +48,7 @@ class PackageManager {
       stdio: goWithDefault ? 'ignore' : 'inherit',
     });
 
-    packageSpinner.succeed(`🔨 Initialized The Package with ${pkgManager}`);
+    packageSpinner.succeed(`🔨 Initialized The Package with ${pkgManager.type}`);
   }
 
   static createScripts(
