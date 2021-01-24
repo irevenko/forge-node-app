@@ -148,7 +148,7 @@ class ProjectGenerator {
 
     console.log(chalk.greenBright('🎉 Ready!'));
     console.log(
-      chalk.greenBright(`🚀 cd ${projectName} && ${packageManager.type} start`)
+      chalk.greenBright(`🚀 cd ${projectName} && ${pkgManagerName} start`)
     );
 
     if (extraOptions!.includes('git')) {
